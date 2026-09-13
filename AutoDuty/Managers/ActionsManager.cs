@@ -1005,7 +1005,15 @@ namespace AutoDuty.Managers
             else
                 dataIds.Add(TryGetObjectIdRegex(action.Arguments[0], out objectDataId) ? (uint.TryParse(objectDataId, out var dataId) ? dataId : 0) : 0);
 
-            if (dataIds.All(x => x.Equals("0"))) return;
+            // 🔴 dataIds 是 List<uint>，跟字面量 "0"（string）永遠不可能相等——這個防呆
+            //    形同虛設，路徑檔的 Arguments 只要不是純數字（例如誤填成物件顯示名稱），
+            //    parse 失敗會靜默退回 0，然後去找 BaseId=0 的物件亂互動、永遠卡住重試，
+            //    而不是像這裡原本想要的那樣直接跳過這一步。
+            if (dataIds.All(x => x == 0))
+            {
+                Svc.Log.Warning($"Interactable: 所有參數都解析不出有效的 DataId（Arguments=[{string.Join(", ", action.Arguments)}]），跳過這一步。");
+                return;
+            }
 
             // 閉包只捕獲 GameObjectId,每個任務執行時才重查物件表。
             ulong? objectId = null;
