@@ -307,19 +307,6 @@
       "Note": ""
     },
     {
-      "Tag": "None",
-      "Name": "MoveTo",
-      "Position": {
-        "X": -337.09,
-        "Y": -32.16,
-        "Z": -143.79
-      },
-      "Arguments": [
-        ""
-      ],
-      "Note": ""
-    },
-    {
       "Tag": "W2W",
       "Name": "StopForCombat",
       "Position": {
@@ -329,6 +316,19 @@
       },
       "Arguments": [
         "true"
+      ],
+      "Note": "提前開啟,避免長距離走位途中拖怪到王前"
+    },
+    {
+      "Tag": "None",
+      "Name": "MoveTo",
+      "Position": {
+        "X": -337.09,
+        "Y": -32.16,
+        "Z": -143.79
+      },
+      "Arguments": [
+        ""
       ],
       "Note": ""
     },
@@ -396,6 +396,10 @@
       {
         "Version": 241,
         "Change": ""
+      },
+      {
+        "Version": 242,
+        "Change": "第三段(Myradrosh 到最終王)StopForCombat 提前開啟,避免走廊小怪被拖怪到王前造成坦克陣亡"
       }
     ],
     "Notes": []
