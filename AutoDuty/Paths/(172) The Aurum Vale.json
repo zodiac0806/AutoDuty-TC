@@ -22,9 +22,9 @@
         "Z": 0.0
       },
       "Arguments": [
-        "false"
+        "true"
       ],
-      "Note": ""
+      "Note": "入口走廊改成停下清怪,避免第一王前這段拖怪打死人"
     },
     {
       "Tag": "None",
@@ -400,6 +400,10 @@
       {
         "Version": 242,
         "Change": "第三段(Myradrosh 到最終王)StopForCombat 提前開啟,避免走廊小怪被拖怪到王前造成坦克陣亡"
+      },
+      {
+        "Version": 243,
+        "Change": "入口到第一王前那段 StopForCombat 改成 true,避免入場走廊拖怪陣亡"
       }
     ],
     "Notes": []
