@@ -1707,7 +1707,16 @@ public sealed class AutoDuty : IDalamudPlugin
 
         Action = $"Waiting For Combat";
 
-        
+        // 🔴 真正驅動 BossMod AI 戰鬥/走位的 AI.SetPreset 只在 PlayerHelper.InCombat 時才會送出去
+        // (見 IPCSubscriber.SetPreset 的註解)。StartNavigation() 進副本時打的第一次
+        // SetRotationPluginSettings(true) 那時還沒進戰鬥，武裝不到；如果進場沒幾秒就先撞到
+        // 非王的雜魚，StageMoving() 想在進戰鬥當下補打一次，又會被 5 秒節流擋掉——擋掉之後
+        // Stage 立刻切進這裡，而這裡原本完全沒有重試邏輯，只能等角色走到王 50 碼內才會透過
+        // StageAction() 補武裝，中間這段角色就會「有分配 preset 但沒真正開機」乾站著不動。
+        // 這裡持續嘗試（受同一個節流保護，不會洗頻），節流一過期就會成功補上。
+        if (PlayerHelper.InCombat && this.Configuration is { AutoManageRotationPluginState: true, UsingAlternativeRotationPlugin: false })
+            SetRotationPluginSettings(true);
+
         if (ReflectionHelper.Avarice_Reflection.PositionalChanged(out Positional positional) && !Plugin.Configuration.UsingAlternativeBossPlugin && IPCSubscriber_Common.IsReady("BossModReborn"))
             BossMod_IPCSubscriber.SetPositional(positional);
 
