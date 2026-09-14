@@ -870,6 +870,7 @@ namespace AutoDuty.Managers
         {
             if (Conditions.Instance()->Mounted || Conditions.Instance()->RidingPillion)
             {
+                Plugin.Action = "";
                 Svc.Log.Debug("InteractableCheck: giving up, Mounted/RidingPillion");
                 return true;
             }
@@ -881,12 +882,14 @@ namespace AutoDuty.Managers
                 return false;
             else if (AddonHelper.ClickSelectYesno(true))
             {
+                Plugin.Action = "";
                 Svc.Log.Debug("InteractableCheck: giving up, clicked SelectYesno(true)");
                 return true;
             }
 
             if (GenericHelpers.TryGetAddonByName("SelectString", out AtkUnitBase* addonSelectString) && GenericHelpers.IsAddonReady(addonSelectString))
             {
+                Plugin.Action = "";
                 Svc.Log.Debug("InteractableCheck: giving up, SelectString addon is open");
                 return true;
             }
@@ -895,12 +898,14 @@ namespace AutoDuty.Managers
                 return false;
             else if (AddonHelper.ClickTalk())
             {
+                Plugin.Action = "";
                 Svc.Log.Debug("InteractableCheck: giving up, clicked Talk");
                 return true;
             }
 
             if (gameObject == null || !IsValid)
             {
+                Plugin.Action = "";
                 Svc.Log.Debug($"InteractableCheck: giving up, gameObject is {(gameObject == null ? "null" : "non-null")}, IsValid={IsValid}");
                 return true;
             }
@@ -919,12 +924,14 @@ namespace AutoDuty.Managers
 
             if (!TryGetObjectByDataId(targetDataId, out var target) || target == null)
             {
+                Plugin.Action = "";
                 Svc.Log.Debug($"InteractableCheck: giving up, no object found for dataId {targetDataId}");
                 return true;
             }
 
             if (!target.IsTargetable || !target.IsValid())
             {
+                Plugin.Action = "";
                 Svc.Log.Debug($"InteractableCheck: giving up on {target.Name} <{target.GameObjectId:X}> at {target.Position}, IsTargetable={target.IsTargetable}, IsValid={target.IsValid()}");
                 return true;
             }

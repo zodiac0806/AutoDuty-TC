@@ -1844,6 +1844,12 @@ public sealed class AutoDuty : IDalamudPlugin
     private void DoneNavigating()
     {
         States &= ~PluginState.Navigating;
+        // 路徑真的跑完了(不管最後一步是什麼)。Stage.Reading_Path(=1)恆小於
+        // Stage.Condition(=4),PreStageChecks() 裡 `Action = Stage.ToCustomString()`
+        // 那個通用 fallback 永遠蓋不到 Reading_Path,所以最後一步若是單純的 MoveTo,
+        // Action 會停在上一次 StageMoving 設的字串,讓 CheckFinishing 誤判「還沒做完」
+        // 白等一輪 60 秒逃生口。在這裡直接清空,不依賴那個蓋不到的 fallback。
+        Action = string.Empty;
         this.CheckFinishing();
     }
 
