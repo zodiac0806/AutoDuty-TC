@@ -41,3 +41,4 @@ jobs:
       - name: Build with dotnet
         run: dotnet build --configuration Release AutoDuty/AutoDuty.csproj -p:DalamudLibPath="$env:AppData\FFXIVSimpleLauncher\Dalamud\Injector\"
 
+

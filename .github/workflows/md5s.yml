@@ -132,3 +132,4 @@ jobs:
             echo ""
             echo "\`$(git log -1 --format='%s')\`"
           } >> "$GITHUB_STEP_SUMMARY"
+
