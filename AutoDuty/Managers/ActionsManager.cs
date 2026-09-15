@@ -946,7 +946,17 @@ namespace AutoDuty.Managers
         private unsafe void Interactable(ulong? objectId)
         {
             _taskManager.Enqueue(() => BossMod_IPCSubscriber.SetMovement(false));
-            _taskManager.Enqueue(() => InteractableCheck(ResolveObject(objectId)), "Interactable-InteractableCheck");
+            // InteractableCheck 回 true ＝ 放棄(七個分支都印 "giving up")。放棄時一定要清空
+            // Action:CheckFinishing 只認 Action 是不是空字串來判斷「這步做完了沒」,漏清空
+            // 會讓它白等一輪 60 秒逃生口才退本。這是唯一呼叫點,在這裡清等同於逐個分支清。
+            _taskManager.Enqueue(() =>
+                                 {
+                                     if (!InteractableCheck(ResolveObject(objectId)))
+                                         return false;
+
+                                     Plugin.Action = "";
+                                     return true;
+                                 }, "Interactable-InteractableCheck");
             _taskManager.Enqueue(() => IsCasting, 500, "Interactable-WaitIsCasting");
             _taskManager.Enqueue(() => !IsCasting, "Interactable-WaitNotIsCasting");
             _taskManager.Enqueue(() => BossMod_IPCSubscriber.SetMovement(true));
@@ -1005,7 +1015,14 @@ namespace AutoDuty.Managers
             else
                 dataIds.Add(TryGetObjectIdRegex(action.Arguments[0], out objectDataId) ? (uint.TryParse(objectDataId, out var dataId) ? dataId : 0) : 0);
 
-            if (dataIds.All(x => x.Equals("0"))) return;
+            // 契約:TryGetObjectIdRegex 解析不出數字時退回 0。全部都是 0 ⇒ 這一步的 Arguments
+            // 整個填錯(例如誤填物件顯示名稱),硬跑下去只會對 BaseId=0 的物件死等到逾時。
+            if (dataIds.All(x => x == 0))
+            {
+                Svc.Log.Warning($"Interactable: Arguments 解析不出任何 DataId,跳過這一步。"
+                              + $"Arguments=[{string.Join(", ", action.Arguments)}]");
+                return;
+            }
 
             // 閉包只捕獲 GameObjectId,每個任務執行時才重查物件表。
             ulong? objectId = null;
