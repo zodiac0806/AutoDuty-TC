@@ -71,17 +71,23 @@ AutoDuty/
 
 ```json
 {
-  "actions": [
+  "Actions": [
     {
-      "tag": 0,
-      "name": "ActionName",
-      "position": { "X": 0.0, "Y": 0.0, "Z": 0.0 },
-      "arguments": ["arg1"],
-      "note": ""
+      "Tag": "None",
+      "Name": "ActionName",
+      "Position": { "X": 0.0, "Y": 0.0, "Z": 0.0 },
+      "Arguments": ["arg1"],
+      "Conditions": [],
+      "Note": ""
     }
   ]
 }
 ```
+
+Key 比對不分大小寫(`BuildTab.jsonSerializerOptions` 設了 `PropertyNameCaseInsensitive = true`),
+所以偶爾看到的全小寫檔案不會壞掉 —— 但那是例外不是慣例。326 個路徑檔裡:
+**309 個是上面這種 PascalCase 物件**、8 個是全小寫 key、9 個是更舊的「整份就是一個陣列」格式。
+新增或修改路徑檔一律照上面的範例。
 
 **Common action names**: `MoveTo`, `Boss`, `TreasureCoffer`, `DutySpecificCode`, `Interactable`
 

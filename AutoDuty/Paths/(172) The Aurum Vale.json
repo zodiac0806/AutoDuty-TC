@@ -22,9 +22,9 @@
         "Z": 0.0
       },
       "Arguments": [
-        "false"
+        "true"
       ],
-      "Note": ""
+      "Note": "入口到第一王這段改成停下清怪,不要一路拖怪"
     },
     {
       "Tag": "None",
@@ -307,19 +307,6 @@
       "Note": ""
     },
     {
-      "Tag": "None",
-      "Name": "MoveTo",
-      "Position": {
-        "X": -337.09,
-        "Y": -32.16,
-        "Z": -143.79
-      },
-      "Arguments": [
-        ""
-      ],
-      "Note": ""
-    },
-    {
       "Tag": "W2W",
       "Name": "StopForCombat",
       "Position": {
@@ -329,6 +316,19 @@
       },
       "Arguments": [
         "true"
+      ],
+      "Note": "提前開啟:後面那段長距離走位途中被引到的怪要就地清掉,不要拖到最終王面前"
+    },
+    {
+      "Tag": "None",
+      "Name": "MoveTo",
+      "Position": {
+        "X": -337.09,
+        "Y": -32.16,
+        "Z": -143.79
+      },
+      "Arguments": [
+        ""
       ],
       "Note": ""
     },
@@ -396,6 +396,14 @@
       {
         "Version": 241,
         "Change": ""
+      },
+      {
+        "Version": 242,
+        "Change": "第三段(Myradrosh 到最終王)StopForCombat 提前到長距離走位之前開啟"
+      },
+      {
+        "Version": 243,
+        "Change": "入口到第一王那段 StopForCombat 由 false 改成 true"
       }
     ],
     "Notes": []
