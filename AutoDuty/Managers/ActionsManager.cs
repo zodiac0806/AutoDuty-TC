@@ -1087,7 +1087,12 @@ namespace AutoDuty.Managers
 
             _taskManager.Enqueue(() => MovementHelper.Move(gameObjects[index], 0.25f, 1f), "BossLoot-MoveToChest");
             this.Wait(new PathAction() { Arguments = ["250"] });
-            
+
+            // 走到寶箱旁邊不會自動打開它 —— 原本這裡只有移動、從沒呼叫過互動,寶箱永遠
+            // 原封不動。這裡借用既有的 Interactable(ulong?) 走到+互動流程實際把它打開。
+            var chestId = gameObjects[index].GameObjectId;
+            Interactable(chestId);
+
             _taskManager.Enqueue(() =>
             {
                 index++;

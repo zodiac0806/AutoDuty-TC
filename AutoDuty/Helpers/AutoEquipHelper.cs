@@ -112,7 +112,7 @@ namespace AutoDuty.Helpers
             }
         }
 
-        private List<(uint ItemId, InventoryType? SourceInventory, int? SourceInventorySlot, RaptureGearsetModule.GearsetItemIndex TargetSlot)>? _gearset           = null;
+        private List<(uint ItemId, InventoryType? SourceInventory, byte? SourceInventorySlot, RaptureGearsetModule.GearsetItemIndex TargetSlot)>? _gearset           = null;
         private int                                                                                                                               _index             = 0;
 
         private void AutoEquipGearSetterUpdate(IFramework framework)

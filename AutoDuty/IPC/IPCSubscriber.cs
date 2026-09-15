@@ -529,7 +529,7 @@ namespace AutoDuty.IPC
 
         internal static bool IsEnabled => IPCSubscriber_Common.IsReady("Gearsetter");
 
-        internal static List<(uint ItemId, InventoryType? SourceInventory, int? SourceInventorySlot, RaptureGearsetModule.GearsetItemIndex TargetSlot)> GetRecommendationsForGearset(byte gearset) =>
+        internal static List<(uint ItemId, InventoryType? SourceInventory, byte? SourceInventorySlot, RaptureGearsetModule.GearsetItemIndex TargetSlot)> GetRecommendationsForGearset(byte gearset) =>
             Pkg.GetRecommendationsForGearset(gearset);
 
         internal static void Dispose() { }
