@@ -1079,22 +1079,29 @@ namespace AutoDuty.Managers
             return MovementHelper.Move(bossV3);
         }
 
-        private void BossLoot(List<IGameObject>? gameObjects, int index)
+        // 收 GameObjectId 而不是 IGameObject:清單是在前一幀建的,IObjectTable 的包裝是
+        // 每格共用、存取時就地改寫 Address ⇒ 跨幀持有會靜默換人或懸空。id 在建清單那一幀抄走。
+        private void BossLoot(List<ulong>? objectIds, int index)
         {
-            if (gameObjects == null || gameObjects.Count < 1)
+            if (objectIds == null || objectIds.Count < 1)
             {
                 _taskManager.DelayNext("BossLoot-WaitASecToLootChest", 1000);
                 return;
             }
 
-            _taskManager.Enqueue(() => MovementHelper.Move(gameObjects[index], 0.25f, 1f), "BossLoot-MoveToChest");
+            ulong chestId = objectIds[index];
+
+            _taskManager.Enqueue(() => MovementHelper.Move(ResolveObject(chestId), 0.25f, 1f), "BossLoot-MoveToChest");
             this.Wait(new PathAction() { Arguments = ["250"] });
-            
+
+            // 走到寶箱旁邊不會自動開啟它 —— 這裡原本只有移動、從沒呼叫過互動,寶箱永遠原封不動。
+            Interactable(chestId);
+
             _taskManager.Enqueue(() =>
             {
                 index++;
-                if (gameObjects.Count > index)
-                    BossLoot(gameObjects, index);
+                if (objectIds.Count > index)
+                    BossLoot(objectIds, index);
                 else
                     _taskManager.DelayNext("BossLoot-WaitASecToLootChest", 1000);
             }, "BossLoot-LoopOrDelay");
@@ -1104,7 +1111,7 @@ namespace AutoDuty.Managers
         {
             Svc.Log.Info($"Starting Action Boss: {Plugin.BossObject?.Name.TextValue ?? "null"}");
             int index = 0;
-            List<IGameObject>? treasureCofferObjects = null;
+            List<ulong>? treasureCofferObjects = null;
             Plugin.SkipTreasureCoffer = false;
             StopForCombat(new PathAction() { Arguments = ["true", "noWait"] });
             _taskManager.Enqueue(() => BossMoveCheck(action.Position),                           "Boss-MoveCheck");
@@ -1119,7 +1126,7 @@ namespace AutoDuty.Managers
             if (Plugin.Configuration.LootTreasure)
             {
                 _taskManager.DelayNext("Boss-TreasureDelay", 1000);
-                _taskManager.Enqueue(() => treasureCofferObjects = GetObjectsByObjectKind(Dalamud.Game.ClientState.Objects.Enums.ObjectKind.Treasure)?.Where(x => BelowDistanceToPlayer(x.Position, 50, 10)).ToList(), "Boss-GetTreasureChests");
+                _taskManager.Enqueue(() => treasureCofferObjects = GetObjectsByObjectKind(Dalamud.Game.ClientState.Objects.Enums.ObjectKind.Treasure)?.Where(x => BelowDistanceToPlayer(x.Position, 50, 10)).Select(x => x.GameObjectId).ToList(), "Boss-GetTreasureChests");
                 _taskManager.Enqueue(() => BossLoot(treasureCofferObjects, index), "Boss-LootCheck");
             }
         }

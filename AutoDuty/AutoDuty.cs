@@ -1630,7 +1630,7 @@ public sealed class AutoDuty : IDalamudPlugin
             return;
         }
 
-        if (EzThrottler.Throttle("BossChecker", 25) && PathAction.Equals("Boss") && PathAction.Position != Vector3.Zero && ObjectHelper.BelowDistanceToPlayer(PathAction.Position, 50, 10))
+        if (EzThrottler.Throttle("BossChecker", 25) && PathAction.Name.Equals("Boss") && PathAction.Position != Vector3.Zero && ObjectHelper.BelowDistanceToPlayer(PathAction.Position, 50, 10))
         {
             BossObject = ObjectHelper.GetBossObject(25);
             if (BossObject != null)
@@ -1707,7 +1707,14 @@ public sealed class AutoDuty : IDalamudPlugin
 
         Action = $"Waiting For Combat";
 
-        
+        // AI.SetPreset 只在 InCombat 時才真的武裝(見 IPCSubscriber.SetPreset)。進副本時打的
+        // 那一次還沒進戰鬥、武裝不到卻已經吃掉 5 秒節流;若進場沒幾秒就撞到雜魚,StageMoving
+        // 的補打會被節流擋掉並立刻切進這裡,而這裡原本沒有任何重試 —— 角色會「有分配 preset
+        // 但沒開機」乾站著,直到走進王 50 碼內才由 StageAction 補回。改成持續嘗試(受同一個
+        // 節流保護,不會洗頻),節流一過期就補上。
+        if (PlayerHelper.InCombat && this.Configuration is { AutoManageRotationPluginState: true, UsingAlternativeRotationPlugin: false })
+            SetRotationPluginSettings(true);
+
         if (ReflectionHelper.Avarice_Reflection.PositionalChanged(out Positional positional) && !Plugin.Configuration.UsingAlternativeBossPlugin && IPCSubscriber_Common.IsReady("BossModReborn"))
             BossMod_IPCSubscriber.SetPositional(positional);
 
