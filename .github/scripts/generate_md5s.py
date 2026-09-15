@@ -27,8 +27,8 @@ UTF-8 無 BOM、LF、`indent=4`、`ensure_ascii=True`（日文檔名寫成 \\uXX
 鍵**升冪排序**、值小寫十六進位、**檔尾沒有換行**。
 上游 erdelf 的 `.github/workflows/md5filecreation.yml` 是
 `md5sum AutoDuty/Paths/*` + `json.dump(..., indent=4)`，產出格式相同，
-但本檔有兩處刻意不同：只收 `*.json`（本 fork 的 Paths 有 11 個非 .json 的編輯殘留
-備份檔，上游那個 `*` glob 會把它們一起寫進清單），以及明確 `sorted()`
+但本檔有兩處刻意不同：只收 `*.json`（非 .json 的編輯殘留備份檔會被上游那個 `*` glob
+一起寫進清單，而 Patcher 下載回去也沒有任何東西讀得到它們），以及明確 `sorted()`
 而不是靠 shell glob 的排序。
 
 用法
