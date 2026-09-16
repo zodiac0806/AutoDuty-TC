@@ -1,4 +1,5 @@
-﻿using ECommons.EzIpcManager;
+﻿using Dalamud.Plugin.Ipc.Exceptions;
+using ECommons.EzIpcManager;
 using System;
 using System.Collections.Generic;
 
@@ -31,6 +32,10 @@ internal static class EzIpcFailureLog
     private const int MaxTrackedMessages = 128;
 
     private static readonly Dictionary<string, long> LastLogged = new();
+
+    /// <summary>已經用 Information 印過的訊息。與 <see cref="LastLogged"/> 共用同一把鎖。</summary>
+    private static readonly HashSet<string> InformedOnce = [];
+
     private static bool Subscribed;
 
     /// <summary>在外掛進入點呼叫一次。重複呼叫是安全的。</summary>
@@ -55,6 +60,7 @@ internal static class EzIpcFailureLog
             if(!Subscribed) return;
             Subscribed = false;
             LastLogged.Clear();
+            InformedOnce.Clear();
         }
         EzIPC.OnSafeInvocationException -= OnSafeInvocationException;
     }
@@ -89,15 +95,27 @@ internal static class EzIpcFailureLog
             // 而每一種失敗的**第一次一定會印出來**。
             var detail = $"{e.GetType().Name}: {e.Message}";
             var now = Environment.TickCount64;
+            bool firstForThisDetail;
             lock(LastLogged)
             {
                 if(LastLogged.TryGetValue(detail, out var last) && now - last < ThrottleMs) return;
-                if(LastLogged.Count >= MaxTrackedMessages) LastLogged.Clear();
+                if(LastLogged.Count >= MaxTrackedMessages)
+                {
+                    LastLogged.Clear();
+                    InformedOnce.Clear();
+                }
                 LastLogged[detail] = now;
+                firstForThisDetail = InformedOnce.Add(detail);
             }
-            // 一律 Information：使用者的記錄等級只會濾掉 Verbose、Debug 收得到但單檔數十萬行會淹沒。
-            global::ECommons.DalamudServices.Svc.Log.Information(
-                $"[EzIPC] 跨外掛 IPC 呼叫失敗，例外已被 SafeWrapper 吞掉並回傳 default 值：{detail}");
+            // 對方外掛沒裝時,IpcNotReadyError 每 60 秒重印一次是純噪音:第一則就說完了全部資訊。
+            // 所以同一個端點只有第一則走 Information,之後降 Verbose;其他例外型別維持原樣 ——
+            // 型別不符、提供端自己擲的例外才是這張觀測網的價值。
+            var message =
+                $"[EzIPC] 跨外掛 IPC 呼叫失敗，例外已被 SafeWrapper 吞掉並回傳 default 值：{detail}";
+            if(!firstForThisDetail && e is IpcNotReadyError)
+                global::ECommons.DalamudServices.Svc.Log.Verbose(message);
+            else
+                global::ECommons.DalamudServices.Svc.Log.Information(message);
         }
         catch
         {
