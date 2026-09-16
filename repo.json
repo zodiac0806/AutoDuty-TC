@@ -6,7 +6,7 @@
     "AssemblyVersion": "7.20.0.57",
     "Description": "自動幫你跑副本，支援信賴的同伴、達人指引、士官兵團、多變或一般模式。需搭配 BossModReborn、vnavmesh 與一款戰鬥循環插件（WrathCombo 或 BossMod AutoRotation）使用。\n\n本版本修正死亡重生時查無路徑資料會整個丟例外、每一幀重複報錯洗版的問題；副本結束前補上等待 Need/Greed 骰寶箱視窗關閉、以及 Action/路徑真的跑完的判斷（最多等60秒），避免副本剛結束就被拉出去或卡住不出。",
     "ApplicableVersion": "any",
-    "RepoUrl": "https://github.com/okaminico/AutoDuty-1",
+    "RepoUrl": "https://github.com/okaminico/AutoDuty-TC",
     "DalamudApiLevel": 13,
     "LoadRequiredState": 0,
     "LoadSync": false,
@@ -15,8 +15,8 @@
     "IconUrl": "https://raw.githubusercontent.com/ffxiv-tc-port/DalamudPluginsTC/main/icons/AutoDuty.png",
     "Punchline": "自動跑本，解放雙手（台服修正版，修正巴哈姆特邂逅之章3卡住）。",
     "AcceptsFeedback": true,
-    "DownloadLinkInstall": "https://github.com/okaminico/AutoDuty-1/releases/download/v7.20.0.57/AutoDuty.zip",
-    "DownloadLinkUpdate": "https://github.com/okaminico/AutoDuty-1/releases/download/v7.20.0.57/AutoDuty.zip",
+    "DownloadLinkInstall": "https://github.com/okaminico/AutoDuty-TC/releases/download/v7.20.0.57/AutoDuty.zip",
+    "DownloadLinkUpdate": "https://github.com/okaminico/AutoDuty-TC/releases/download/v7.20.0.57/AutoDuty.zip",
     "Changelog": "修正死亡重生查無路徑資料時的例外洗版問題；副本結束前補上等待骰寶箱視窗關閉/路徑真的跑完的判斷（2026-09-09）。"
   }
 ]

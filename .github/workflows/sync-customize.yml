@@ -1,13 +1,14 @@
-name: Sync Upstream & Auto Release
+name: Sync tw-fix into customize & Auto Release
 
-# 每天自動抓 ffxiv-tc-port/AutoDuty（tc-7.20）的更新，合併進本分支（tw-fix）。
+# 每天把 tw-fix（已經合併過 ffxiv-tc-port/AutoDuty tc-7.20 上游、且建置驗證過）同步進 customize。
+# customize 是實際發布給朋友的版本，可能疊了 tw-fix 沒有的個人專屬調整。
 # 只有在「合併乾淨（無衝突） 且 建置成功」時，才會推送、發新版 release、更新 repo.json。
 # 只要遇到合併衝突或建置失敗，就整個跳過不動、工作流程標記失敗，等你手動處理，
 # 不會有半殘的東西被推上去或發佈給朋友。
 
 on:
   schedule:
-    - cron: '0 18 * * *' # 每天 UTC 18:00（台灣時間 02:00）
+    - cron: '30 18 * * *' # 每天 UTC 18:30（台灣時間 02:30，排在 sync-tc-upstream.yml 之後)
   workflow_dispatch:
 
 permissions:
@@ -17,10 +18,10 @@ jobs:
   sync:
     runs-on: windows-latest
     steps:
-      - name: Checkout tw-fix
+      - name: Checkout customize
         uses: actions/checkout@v5
         with:
-          ref: tw-fix
+          ref: customize
           submodules: recursive
           fetch-depth: 0
 
@@ -29,17 +30,15 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Fetch upstream
-        run: |
-          git remote add upstream https://github.com/ffxiv-tc-port/AutoDuty.git
-          git fetch upstream tc-7.20
+      - name: Fetch tw-fix
+        run: git fetch origin tw-fix
 
-      - name: Merge upstream
+      - name: Merge tw-fix
         id: merge
         shell: pwsh
         run: |
           $before = git rev-parse HEAD
-          git merge --no-edit upstream/tc-7.20
+          git merge --no-edit origin/tw-fix
           if ($LASTEXITCODE -ne 0) {
             Write-Host "::warning::合併發生衝突，中止並跳過本次自動流程"
             git merge --abort
@@ -101,7 +100,7 @@ jobs:
           $json[0].AssemblyVersion = $ver
           $json[0].DownloadLinkInstall = "https://github.com/${{ github.repository }}/releases/download/$tag/latest.zip"
           $json[0].DownloadLinkUpdate = "https://github.com/${{ github.repository }}/releases/download/$tag/latest.zip"
-          $json[0].Changelog = "自動合併 ffxiv-tc-port/AutoDuty 上游更新（$(Get-Date -Format 'yyyy-MM-dd')）。"
+          $json[0].Changelog = "自動同步 tw-fix 更新（$(Get-Date -Format 'yyyy-MM-dd')）。"
           $json | ConvertTo-Json -Depth 10 -AsArray | Set-Content -Path repo.json
           "TAG=$tag" | Out-File -FilePath $env:GITHUB_ENV -Append
 
@@ -115,16 +114,16 @@ jobs:
         if: steps.merge.outputs.status == 'merged' && steps.build.outputs.status == 'success'
         run: |
           git add repo.json
-          git commit -m "Auto-sync upstream + republish ($env:TAG)"
-          git push origin tw-fix
+          git commit -m "Auto-sync tw-fix + republish ($env:TAG)"
+          git push origin customize
 
       - name: Create release
         if: steps.merge.outputs.status == 'merged' && steps.build.outputs.status == 'success'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
-          name: "AutoDuty ${{ steps.build.outputs.version }}（自動同步上游）"
-          target_commitish: tw-fix
+          name: "AutoDuty ${{ steps.build.outputs.version }}（自動同步 customize）"
+          target_commitish: customize
           files: |
             latest.zip
           generate_release_notes: false
