@@ -25,6 +25,10 @@ namespace AutoDuty.Managers
 
     internal class ActionsManager(AutoDuty _plugin, TaskManager _taskManager)
     {
+        /// <summary>「先 Throttle 起算、再 Check 到期」的逾時餘裕(毫秒)。AbortAt 只比 throttle 到期晚一幀,
+        /// 不留餘裕的話一次卡頓就會讓準時完成的任務被記成逾時;餘裕本身不會延長等待。</summary>
+        internal const int ThrottleTimeoutMarginMs = 1000;
+
         public readonly List<(string, string, string)> ActionsList =
         [
             ("<-- Comment -->","comment?","Adds a Comment to the path; AutoDuty will do nothing but display them.\nExample: <-- Trash Pack #1 -->"),
@@ -492,7 +496,7 @@ namespace AutoDuty.Managers
             _taskManager.Enqueue(() => VNavmesh_IPCSubscriber.Path_MoveTo([position], false), "Start-JumpTo-Move");
 
             _taskManager.Enqueue(() => EzThrottler.Throttle("JumpTo", wait), "JumpTo-Wait");
-            _taskManager.Enqueue(() => EzThrottler.Check("JumpTo"), wait, "JumpTo-Wait");
+            _taskManager.Enqueue(() => EzThrottler.Check("JumpTo"), wait + ThrottleTimeoutMarginMs, "JumpTo-Wait");
 
             _taskManager.Enqueue(() => ActionManager.Instance()->UseAction(ActionType.GeneralAction, 2), "JumpTo-Jump");
             _taskManager.Enqueue(() => MovementHelper.Move(position, useMesh: false), "Finish-JumpTo-Move");
@@ -642,7 +646,7 @@ namespace AutoDuty.Managers
             {
                 _taskManager.Enqueue(() => Chat.ExecuteCommand("/automove on"), "Jump");
                 _taskManager.Enqueue(() => EzThrottler.Throttle("AutoMove", Convert.ToInt32(wait)), "Jump");
-                _taskManager.Enqueue(() => EzThrottler.Check("AutoMove"), Convert.ToInt32(wait), "Jump");
+                _taskManager.Enqueue(() => EzThrottler.Check("AutoMove"), Convert.ToInt32(wait) + ThrottleTimeoutMarginMs, "Jump");
             }
 
             _taskManager.Enqueue(() => ActionManager.Instance()->UseAction(ActionType.GeneralAction, 2), "Jump");
@@ -699,7 +703,7 @@ namespace AutoDuty.Managers
             if (Plugin.StopForCombat)
                 _taskManager.Enqueue(() => !Player.Character->InCombat, int.MaxValue, "Wait");
             _taskManager.Enqueue(() => StartWaitThrottle(waitMs), "Wait");
-            _taskManager.Enqueue(() => EzThrottler.Check("Wait"), waitMs, "Wait");
+            _taskManager.Enqueue(() => EzThrottler.Check("Wait"), waitMs + ThrottleTimeoutMarginMs, "Wait");
             if (Plugin.StopForCombat)
                 _taskManager.Enqueue(() => !Player.Character->InCombat, int.MaxValue, "Wait");
             _taskManager.Enqueue(() => { Plugin.ClearWaitStepTiming(); Plugin.Action = ""; });
