@@ -151,7 +151,10 @@ namespace AutoDuty.Managers
 
                 job ??= PlayerHelper.GetJob();
 
-                DutyPath defaultPath = this.Paths[0];
+                // 同一副本可能有多個路徑檔(例如舊檔案還沒清掉),this.Paths 的順序來自
+                // FileHelper.Update() 掃磁碟的順序(檔案系統列舉順序),跟版本號無關。
+                // 沒有 job 專屬設定可套用時,「預設路徑」該選版號最大的那份,而不是掃到的第一個。
+                DutyPath defaultPath = GetHighestVersionPath();
 
                 if (job == null)
                 {
@@ -200,6 +203,37 @@ namespace AutoDuty.Managers
             public void AddPath(string name)
             {
                 this.Paths.Add(new DutyPath(name, this));
+            }
+
+            /// <summary>
+            /// 挑 Paths 裡 Meta.LastUpdatedVersion 最大的那份。呼叫 PreloadMeta() 確保版本號
+            /// 讀得到(背景預讀通常已經跑完,但 SelectPath 沒有保證晚於它,所以這裡不能假設
+            /// Meta 已經有值);版本號讀不到(檔案壞掉)時當 0,不會蓋過其他正常檔案。
+            /// </summary>
+            private DutyPath GetHighestVersionPath()
+            {
+                DutyPath best = this.Paths[0];
+                int bestVersion = GetVersion(best);
+
+                for (int i = 1; i < this.Paths.Count; i++)
+                {
+                    DutyPath candidate = this.Paths[i];
+                    int candidateVersion = GetVersion(candidate);
+
+                    if (candidateVersion > bestVersion)
+                    {
+                        best        = candidate;
+                        bestVersion = candidateVersion;
+                    }
+                }
+
+                return best;
+
+                static int GetVersion(DutyPath path)
+                {
+                    path.PreloadMeta();
+                    return path.Meta?.LastUpdatedVersion ?? 0;
+                }
             }
         }
 
