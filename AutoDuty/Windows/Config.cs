@@ -513,6 +513,18 @@ public class Configuration
     public   bool AutoExitDuty                  = true;
     public   bool OnlyExitWhenDutyDone          = false;
     public   bool AutoManageRotationPluginState = true;
+    /// <summary>
+    /// 強制只用 BossMod AutoRotation,不管有沒有裝 WrathCombo／RotationSolver。
+    /// 理由:WrathCombo/RSR 完全不讀 BossMod 模組自己算的 AIHints.Priority
+    /// (例如黃金谷、Batraal 那類需要優先打特定 add 的王),永遠不會主動去打;
+    /// 只有 BossMod 自己的 AutoRotation 會照這個 Priority 選目標。
+    /// <para>
+    /// 🔴 只有在 BossMod 真的有裝(<c>BossMod_IPCSubscriber.IsEnabled</c>)時才生效 ——
+    /// 見 <see cref="AutoDuty.SetRotationPluginSettings"/>。沒裝就照原本流程走,
+    /// 否則等於把場上唯一的循環外掛關掉、整場不出手。
+    /// </para>
+    /// </summary>
+    public   bool ForceBossModAutoRotation      = false;
     internal bool autoManageBossModAISettings   = true;
     public bool AutoManageBossModAISettings
     {
@@ -1725,6 +1737,20 @@ public static class ConfigTab
             if (ImGui.Checkbox("Auto Manage Rotation Plugin State".Loc(), ref Configuration.AutoManageRotationPluginState))
                 Configuration.Save();
             ImGuiComponents.HelpMarker("Autoduty will enable the Rotation Plugin at the start of each duty\n*Only if using Wrath Combo, Rotation Solver or BossMod AutoRotation\n**AutoDuty will try to use them in that order".Loc());
+
+            if (Configuration.AutoManageRotationPluginState)
+            {
+                using (ImRaii.Disabled(!BossMod_IPCSubscriber.IsEnabled))
+                {
+                    if (ImGui.Checkbox("Force BossMod AutoRotation only".Loc(), ref Configuration.ForceBossModAutoRotation))
+                        Configuration.Save();
+                    ImGuiComponents.HelpMarker(("Combat always runs on BossMod's own AutoRotation, even when Wrath Combo or Rotation Solver is installed - AutoDuty turns those off instead of handing the rotation over to them.\n\n" +
+                                                "Why you would want this: some bosses mark one specific enemy as a priority target, such as an add that has to die first. That priority lives inside BossMod's boss module and only BossMod's own AutoRotation reads it - Wrath Combo and Rotation Solver never see it and keep picking targets by their own rules (biggest hitbox, highest HP and so on), so they will not switch to that add on their own.").Loc());
+                }
+
+                if (!BossMod_IPCSubscriber.IsEnabled)
+                    ImGui.Text("* Forcing BossMod AutoRotation requires the BossMod plugin".Loc());
+            }
 
             ImGui.Separator();
             ImGui.AlignTextToFramePadding();

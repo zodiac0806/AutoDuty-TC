@@ -2048,24 +2048,38 @@ public sealed class AutoDuty : IDalamudPlugin
         bool bmEnabled     = BossMod_IPCSubscriber.IsEnabled;
         bool foundRotation = false;
 
+        // 強制只用 BossMod AutoRotation:不能只是跳過偵測——Wrath/RSR 若原本已經在
+        // Auto 狀態,不主動關掉的話會跟 BossMod 的 AutoRotation 搶著放技能。所以這裡是把
+        // 「要不要真的開 Wrath/RSR」跟這個開關掛鉤:該關的時候一樣會呼叫 SetAutoMode(false)
+        // /RotationStop(),只是永遠不會被視為「找到可用的循環外掛」(foundRotation 保持
+        // false),讓下面 bmEnabled 那段走「!foundRotation」分支,套用會讀 AIHints.Priority
+        // 的 "AutoDuty" preset。
+        // 🔴 沒裝 BossMod 就不准強制,否則等於把場上唯一的循環外掛關掉、整場不出手。
+        bool forceBossMod = bmEnabled && this.Configuration.ForceBossModAutoRotation;
+
         if (Wrath_IPCSubscriber.IsEnabled)
         {
+            bool wrathOn            = on && !forceBossMod;
             bool wrathRotationReady = true;
-            if (on)
+            if (wrathOn)
                 wrathRotationReady = Wrath_IPCSubscriber.IsCurrentJobAutoRotationReady() ||
                                      this.Configuration.Wrath_AutoSetupJobs && Wrath_IPCSubscriber.SetJobAutoReady();
 
-            if (!on || wrathRotationReady)
+            if (!wrathOn || wrathRotationReady)
             {
-                Svc.Log.Debug("Wrath rotation enabled");
-                Wrath_IPCSubscriber.SetAutoMode(on);
-                foundRotation = true;
+                Svc.Log.Debug(wrathOn ? "Wrath rotation enabled" : "Wrath rotation disabled");
+                Wrath_IPCSubscriber.SetAutoMode(wrathOn);
+                // 🔴 沒開強制時必須維持上游語意:只要 Wrath 在就算「找到循環外掛」,連 on==false
+                //    的收尾那一側也一樣 —— 下面 DisablePresets 的條件讀的就是這個值,寫成
+                //    `|| wrathOn` 會讓 AutoManageBossModAISettings=false 的人多吃一次
+                //    DisablePresets(),那是本開關關著時不該發生的行為改變。
+                foundRotation = !forceBossMod;
             }
         }
 
         if (ReflectionHelper.RotationSolver_Reflection.RotationSolverEnabled)
         {
-            if (on && !foundRotation)
+            if (on && !foundRotation && !forceBossMod)
             {
                 Svc.Log.Debug("RSR enabled");
                 if (ReflectionHelper.RotationSolver_Reflection.GetStateType != ReflectionHelper.RotationSolver_Reflection.StateTypeEnum.Auto)
