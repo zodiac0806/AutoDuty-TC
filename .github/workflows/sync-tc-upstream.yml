@@ -1,9 +1,10 @@
-name: Sync Upstream & Auto Release
+name: Sync TC Upstream (tw-fix)
 
-# 每天自動抓 ffxiv-tc-port/AutoDuty（tc-7.20）的更新，合併進本分支（tw-fix）。
-# 只有在「合併乾淨（無衝突） 且 建置成功」時，才會推送、發新版 release、更新 repo.json。
-# 只要遇到合併衝突或建置失敗，就整個跳過不動、工作流程標記失敗，等你手動處理，
-# 不會有半殘的東西被推上去或發佈給朋友。
+# 每天自動抓 ffxiv-tc-port/AutoDuty（tc-7.20）的更新，合併進 tw-fix。
+# tw-fix 不對外發布——它是「乾淨、隨時可以拿去回報 PR 給上游」的分支，
+# 所以這裡只做「合併乾淨 + 建置檢查通過」才 push，不建 Release、不碰 repo.json。
+# 真正發布給朋友的是 customize 分支，見 sync-customize.yml（它會再從 tw-fix 同步過去）。
+# 遇到合併衝突或建置失敗就整個跳過不動、工作流程標記失敗，等你手動處理。
 
 on:
   schedule:
@@ -72,62 +73,21 @@ jobs:
           Invoke-WebRequest -Uri https://github.com/ffxiv-tc-port/DalamudPluginsTC/releases/download/dalamud-pin-v13.0.0.16/dalamud-api13-net9.zip -OutFile dalamud-pinned.zip
           Expand-Archive -Force dalamud-pinned.zip "$env:AppData\FFXIVSimpleLauncher\Dalamud\Injector\"
 
-      - name: Build
+      - name: Build check
         id: build
         if: steps.merge.outputs.status == 'merged'
         shell: pwsh
         run: |
-          $current = (Get-Content -Raw repo.json | ConvertFrom-Json)[0].AssemblyVersion
-          $currentBuild = [int]($current -split '\.')[3]
-          $ver = "7.15.1." + ($currentBuild + 1)
-          dotnet build --configuration Release AutoDuty/AutoDuty.csproj -p:DalamudLibPath="$env:AppData\FFXIVSimpleLauncher\Dalamud\Injector\" -p:Version=$ver -p:AssemblyVersion=$ver -p:FileVersion=$ver
+          dotnet build --configuration Release AutoDuty/AutoDuty.csproj -p:DalamudLibPath="$env:AppData\FFXIVSimpleLauncher\Dalamud\Injector\"
           if ($LASTEXITCODE -ne 0) {
             "status=failed" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
             exit 0
           }
           "status=success" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          $json = Get-Content -Raw './AutoDuty/bin/Release/AutoDuty/AutoDuty.json' | ConvertFrom-Json
-          $json.AssemblyVersion = $ver
-          $json | ConvertTo-Json | Set-Content -Path './AutoDuty/bin/Release/AutoDuty/AutoDuty.json'
-          "version=$ver" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
-      - name: Update repo.json
+      - name: Push tw-fix
         if: steps.merge.outputs.status == 'merged' && steps.build.outputs.status == 'success'
-        shell: pwsh
-        run: |
-          $ver = "${{ steps.build.outputs.version }}"
-          $tag = "AutoDuty-v$ver-autosync"
-          $json = Get-Content -Raw repo.json | ConvertFrom-Json
-          $json[0].AssemblyVersion = $ver
-          $json[0].DownloadLinkInstall = "https://github.com/${{ github.repository }}/releases/download/$tag/latest.zip"
-          $json[0].DownloadLinkUpdate = "https://github.com/${{ github.repository }}/releases/download/$tag/latest.zip"
-          $json[0].Changelog = "自動合併 ffxiv-tc-port/AutoDuty 上游更新（$(Get-Date -Format 'yyyy-MM-dd')）。"
-          $json | ConvertTo-Json -Depth 10 -AsArray | Set-Content -Path repo.json
-          "TAG=$tag" | Out-File -FilePath $env:GITHUB_ENV -Append
-
-      - name: Rename artifact to latest.zip for release
-        if: steps.merge.outputs.status == 'merged' && steps.build.outputs.status == 'success'
-        shell: pwsh
-        run: |
-          Copy-Item './AutoDuty/bin/Release/AutoDuty/latest.zip' -Destination 'latest.zip'
-
-      - name: Commit and push
-        if: steps.merge.outputs.status == 'merged' && steps.build.outputs.status == 'success'
-        run: |
-          git add repo.json
-          git commit -m "Auto-sync upstream + republish ($env:TAG)"
-          git push origin tw-fix
-
-      - name: Create release
-        if: steps.merge.outputs.status == 'merged' && steps.build.outputs.status == 'success'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.TAG }}
-          name: "AutoDuty ${{ steps.build.outputs.version }}（自動同步上游）"
-          target_commitish: tw-fix
-          files: |
-            latest.zip
-          generate_release_notes: false
+        run: git push origin tw-fix
 
       - name: Report unfinished sync
         if: steps.merge.outputs.status == 'conflict' || steps.build.outputs.status == 'failed'
