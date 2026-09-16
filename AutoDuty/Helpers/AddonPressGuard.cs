@@ -325,7 +325,7 @@ namespace AutoDuty.Helpers
             presses[pressKey] = new PressRecord(address, frame, escapeFrames);
             // 跨外掛重按診斷:全艦隊每個外掛各有一份本守衛,只擋得住自己按過的位址。
             // 格式必須與其他外掛逐字一致才能交叉比對;不節流(尖峰每分鐘數十次)、不解參考位址。
-            Svc.Log.Debug($"[按窗診斷] plugin=AutoDuty addon={addonName} addr=0x{address:X} key={pressKey}");
+            Svc.Log.Verbose($"[按窗診斷] plugin=AutoDuty addon={addonName} addr=0x{address:X} key={pressKey}");
 
             // 呼叫端宣告「這一發成功的話會開出一扇子視窗」⇒ 登記「那扇子視窗收掉時提早解除本筆」。
             // 🔴 監聽器在「按下的這一刻」就掛上(而不是等到真的去按子視窗時):Dalamud 的
@@ -434,7 +434,7 @@ namespace AutoDuty.Helpers
             presses[ClosePressKey] = new PressRecord(address, frame, escapeFrames);
             // 跨外掛重按診斷:全艦隊每個外掛各有一份本守衛,只擋得住自己按過的位址。
             // 格式必須與其他外掛逐字一致才能交叉比對;不節流(尖峰每分鐘數十次)、不解參考位址。
-            Svc.Log.Debug($"[按窗診斷] plugin=AutoDuty addon={addonName} addr=0x{address:X} key={ClosePressKey}");
+            Svc.Log.Verbose($"[按窗診斷] plugin=AutoDuty addon={addonName} addr=0x{address:X} key={ClosePressKey}");
             return true;
         }
 
