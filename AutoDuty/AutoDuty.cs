@@ -2194,9 +2194,9 @@ public sealed class AutoDuty : IDalamudPlugin
 
     private void CheckRetainerWindow()
     {
-        // AutoBot(AutoMarket)沒裝時就不要打這支 IPC。SafeWrapper 雖然會吃掉
+        // AutoBot(AutoMarket)/AutoRetainer沒裝時就不要打這兩支 IPC。SafeWrapper 雖然會吃掉
         // IpcNotReadyError 並回 false，但 EzIpcFailureLog 會每 60 秒印一行 Information。
-        if (AutoRetainerHelper.State == ActionState.Running || AutoRetainer_IPCSubscriber.IsBusy() || (AM_IPCSubscriber.IsEnabled && AM_IPCSubscriber.IsRunning()) || Stage == Stage.Paused)
+        if (AutoRetainerHelper.State == ActionState.Running || (AutoRetainer_IPCSubscriber.IsEnabled && AutoRetainer_IPCSubscriber.IsBusy()) || (AM_IPCSubscriber.IsEnabled && AM_IPCSubscriber.IsRunning()) || Stage == Stage.Paused)
             return;
 
         if (Svc.Condition[ConditionFlag.OccupiedSummoningBell])
