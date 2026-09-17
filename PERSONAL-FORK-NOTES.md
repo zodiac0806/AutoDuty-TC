@@ -20,6 +20,7 @@
 - `AutoDuty/IPC/IPCSubscriber.cs`、`AutoDuty/Helpers/AutoEquipHelper.cs` — `GetRecommendationsForGearset` 的 `SourceInventorySlot` 型別。**上游在 `4dedf612`(2026-09-06)就修好了**,連 `ECommons.IPC` 指標一起 repin;反而是 `tw-fix` 一直沒跟上,自己編不過,2026-09-17 才補齊
 - `AutoDuty/Paths/(1037) The Tam-Tara Deepcroft.json` — `Interactable` 參數填錯(DataId 誤填成物件名稱字串)。上游不但修了,還把檔名正規化成 `(1037) The TamTara Deepcroft.json`、把修正擴大到更多步驟
 - `AutoDuty/Paths/(172) The Aurum Vale.json` — 兩段走廊 `StopForCombat` 拖怪修正(`StopForCombat` 的值已經一致,只剩 `Note` 措辭不同)
+- `AutoDuty/Paths/(243) The Binding Coil of Bahamut - Turn 3.json` — 現在與上游相同。這邊曾經整份換成 awgil 原始版(87 步、小寫 key)想處理卡路徑,2026-09-17 決定改回採用 `origin/tc-7.20` 的版本(70 步、PascalCase),不再維護自己的分岔
 
 ### 還沒進上游,歡迎參考 🔎
 
@@ -29,7 +30,6 @@
   - 沒跟 `AutoManageBossModAISettings` 連動,兩個設定錯開時會變成 Wrath/RSR 被關掉、BossMod preset 又沒送出去,全程零技能
   - 強制模式下啟用的是 `AutoDuty` preset,但 `SetPositional()` 只寫 `AutoDuty Passive`,而且 `AutoDuty` preset 裡根本沒有 `GoToPositional` 模組 —— 近戰整場王戰不繞側背,完全靜默
   - `SetAutoMode(false)` 為了關一個本來就關著的 Wrath 而去拿租約(`Register()` 失敗的副作用是把 `AutoManageRotationPluginState` 關掉存檔)
-- `AutoDuty/Paths/(243) The Binding Coil of Bahamut - Turn 3.json` — 路徑卡頓,這裡整份換成 awgil 原始上游版本(87 步)。⚠️ `origin/tc-7.20` 現在有自己維護的版本(70 步),兩邊已經分岔,**不建議直接拿這份覆蓋過去**,要比對過再決定
 
 ### 新功能(不是 bug fix)
 
