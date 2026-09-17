@@ -2,7 +2,8 @@
 
 這份文件標註 `tw-fix` 分支上,哪些是**通用 bug 修正**(歡迎參考/採用),哪些是**只適用我個人環境的設定**(請不要照抄,會壞掉或沒有意義)。
 
-**最後核對:2026-09-17,對照 `origin/tc-7.20` 當時的 HEAD。** 底下的「已採納 / 未採納」是逐項比對上游現況得到的,不是憑印象。
+**最後核對:2026-09-17,對照 `origin/tc-7.20` 的 `d22ddb29`,而且 `tw-fix` 已經合併到那一顆(零落後)。**
+底下的「已採納 / 未採納」是逐項比對上游現況得到的,不是憑印象。
 
 ## 🟢 通用修正
 
@@ -51,19 +52,7 @@
 - 根目錄 `repo.json` — 我自己的 Dalamud 外掛倉庫發布清單(版號、下載連結都是我自己的 release)
 - `.github/workflows/sync-tc-upstream.yml`、`.github/workflows/sync-customize.yml` — 我自己的每日自動同步/發版 CI(原本是一份 `sync-upstream.yml`,後來拆成兩份),不是 `origin` 的東西
 - 所有「Point repo.json at twfixN release」「Auto-sync upstream + republish」類的 commit — 我自己發布流程留下的紀錄
-- `AutoDuty/Paths/` 底下 27 個 `1036 - Copy.json-backup`、`1037.json` 之類的檔案 — 上游已經清掉了,這邊還留著,純粹是歷史殘留
 - `.github/workflows/build-check.yml` 補上 `pull_request` 觸發、以及觸發分支加上 `tw-fix`/`customize` — 這兩個例外,是通用的 CI 改善(PR 合併前也該跑建置檢查;只列上游鏡像分支的話這份檢查在個人 fork 上永遠不會跑),不算個人化,但因為改的是 workflow 檔案,列在這裡提醒一下
-
-## ⚠️ tw-fix 目前落後 `origin/tc-7.20` 21 顆
-
-比對時發現的,記在這裡免得忘記。`tw-fix` 缺了上游這些東西:
-
-- `ActionsManager.ThrottleTimeoutMarginMs`(常數 + 3 處呼叫點)
-- `AutoRetainer_IPCSubscriber.IsEnabled &&` / `AM_IPCSubscriber.IsEnabled &&` 這兩個防呆
-- `.github/workflows/md5s.yml` + `.github/scripts/generate_md5s.py`
-- 上游新增/整理過的路徑檔(上游 310 個,這邊 337 個 —— 多出來的是上面提到的殘留檔加重複的 Tam-Tara)
-
-`sync-tc-upstream.yml` 應該要自動處理這件事,如果它一直沒把這些帶進來,去看看那個 workflow 是不是卡在合併衝突上。
 
 ## 為什麼有這份文件
 
