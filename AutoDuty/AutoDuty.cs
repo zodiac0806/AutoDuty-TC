@@ -930,7 +930,7 @@ public sealed class AutoDuty : IDalamudPlugin
                 {
                     TaskManager.Enqueue(() => { Action = $"Waiting {Configuration.WaitTimeBeforeAfterLoopActions}s"; }, "Loop-WaitTimeBeforeAfterLoopActionsActionSet");
                     TaskManager.Enqueue(() => EzThrottler.Throttle("Loop-WaitTimeBeforeAfterLoopActions", Configuration.WaitTimeBeforeAfterLoopActions * 1000), "Loop-WaitTimeBeforeAfterLoopActionsThrottle");
-                    TaskManager.Enqueue(() => EzThrottler.Check("Loop-WaitTimeBeforeAfterLoopActions"), Configuration.WaitTimeBeforeAfterLoopActions * 1000, "Loop-WaitTimeBeforeAfterLoopActionsCheck");
+                    TaskManager.Enqueue(() => EzThrottler.Check("Loop-WaitTimeBeforeAfterLoopActions"), Configuration.WaitTimeBeforeAfterLoopActions * 1000 + ActionsManager.ThrottleTimeoutMarginMs, "Loop-WaitTimeBeforeAfterLoopActionsCheck");
                     TaskManager.Enqueue(() => { Action = $"After Loop Actions"; }, "Loop-AfterLoopActionsSetAction");
                 }
 
@@ -1707,13 +1707,11 @@ public sealed class AutoDuty : IDalamudPlugin
 
         Action = $"Waiting For Combat";
 
-        // 🔴 真正驅動 BossMod AI 戰鬥/走位的 AI.SetPreset 只在 PlayerHelper.InCombat 時才會送出去
-        // (見 IPCSubscriber.SetPreset 的註解)。StartNavigation() 進副本時打的第一次
-        // SetRotationPluginSettings(true) 那時還沒進戰鬥，武裝不到；如果進場沒幾秒就先撞到
-        // 非王的雜魚，StageMoving() 想在進戰鬥當下補打一次，又會被 5 秒節流擋掉——擋掉之後
-        // Stage 立刻切進這裡，而這裡原本完全沒有重試邏輯，只能等角色走到王 50 碼內才會透過
-        // StageAction() 補武裝，中間這段角色就會「有分配 preset 但沒真正開機」乾站著不動。
-        // 這裡持續嘗試（受同一個節流保護，不會洗頻），節流一過期就會成功補上。
+        // AI.SetPreset 只在 InCombat 時才真的武裝(見 IPCSubscriber.SetPreset)。進副本時打的
+        // 那一次還沒進戰鬥、武裝不到卻已經吃掉 5 秒節流;若進場沒幾秒就撞到雜魚,StageMoving
+        // 的補打會被節流擋掉並立刻切進這裡,而這裡原本沒有任何重試 —— 角色會「有分配 preset
+        // 但沒開機」乾站著,直到走進王 50 碼內才由 StageAction 補回。改成持續嘗試(受同一個
+        // 節流保護,不會洗頻),節流一過期就補上。
         if (PlayerHelper.InCombat && this.Configuration is { AutoManageRotationPluginState: true, UsingAlternativeRotationPlugin: false })
             SetRotationPluginSettings(true);
 
@@ -1844,11 +1842,9 @@ public sealed class AutoDuty : IDalamudPlugin
     private void DoneNavigating()
     {
         States &= ~PluginState.Navigating;
-        // 路徑真的跑完了(不管最後一步是什麼)。Stage.Reading_Path(=1)恆小於
-        // Stage.Condition(=4),PreStageChecks() 裡 `Action = Stage.ToCustomString()`
-        // 那個通用 fallback 永遠蓋不到 Reading_Path,所以最後一步若是單純的 MoveTo,
-        // Action 會停在上一次 StageMoving 設的字串,讓 CheckFinishing 誤判「還沒做完」
-        // 白等一輪 60 秒逃生口。在這裡直接清空,不依賴那個蓋不到的 fallback。
+        // 路徑真的跑完了。Update() 尾端那個通用 fallback 的條件是 Stage > Stage.Condition(4),
+        // 而這時 Stage 是 Reading_Path(1) ⇒ 永遠蓋不到這裡;最後一步若是單純 MoveTo,Action 會
+        // 停在舊字串,讓 CheckFinishing 誤判「還沒做完」白等一輪 60 秒逃生口。
         Action = string.Empty;
         this.CheckFinishing();
     }
@@ -2221,7 +2217,9 @@ public sealed class AutoDuty : IDalamudPlugin
 
     private void CheckRetainerWindow()
     {
-        if (AutoRetainerHelper.State == ActionState.Running || AutoRetainer_IPCSubscriber.IsBusy() || AM_IPCSubscriber.IsRunning() || Stage == Stage.Paused)
+        // AutoBot(AutoMarket)/AutoRetainer沒裝時就不要打這兩支 IPC。SafeWrapper 雖然會吃掉
+        // IpcNotReadyError 並回 false，但 EzIpcFailureLog 會每 60 秒印一行 Information。
+        if (AutoRetainerHelper.State == ActionState.Running || (AutoRetainer_IPCSubscriber.IsEnabled && AutoRetainer_IPCSubscriber.IsBusy()) || (AM_IPCSubscriber.IsEnabled && AM_IPCSubscriber.IsRunning()) || Stage == Stage.Paused)
             return;
 
         if (Svc.Condition[ConditionFlag.OccupiedSummoningBell])

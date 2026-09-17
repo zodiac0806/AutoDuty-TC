@@ -25,6 +25,10 @@ namespace AutoDuty.Managers
 
     internal class ActionsManager(AutoDuty _plugin, TaskManager _taskManager)
     {
+        /// <summary>「先 Throttle 起算、再 Check 到期」的逾時餘裕(毫秒)。AbortAt 只比 throttle 到期晚一幀,
+        /// 不留餘裕的話一次卡頓就會讓準時完成的任務被記成逾時;餘裕本身不會延長等待。</summary>
+        internal const int ThrottleTimeoutMarginMs = 1000;
+
         public readonly List<(string, string, string)> ActionsList =
         [
             ("<-- Comment -->","comment?","Adds a Comment to the path; AutoDuty will do nothing but display them.\nExample: <-- Trash Pack #1 -->"),
@@ -492,7 +496,7 @@ namespace AutoDuty.Managers
             _taskManager.Enqueue(() => VNavmesh_IPCSubscriber.Path_MoveTo([position], false), "Start-JumpTo-Move");
 
             _taskManager.Enqueue(() => EzThrottler.Throttle("JumpTo", wait), "JumpTo-Wait");
-            _taskManager.Enqueue(() => EzThrottler.Check("JumpTo"), wait, "JumpTo-Wait");
+            _taskManager.Enqueue(() => EzThrottler.Check("JumpTo"), wait + ThrottleTimeoutMarginMs, "JumpTo-Wait");
 
             _taskManager.Enqueue(() => ActionManager.Instance()->UseAction(ActionType.GeneralAction, 2), "JumpTo-Jump");
             _taskManager.Enqueue(() => MovementHelper.Move(position, useMesh: false), "Finish-JumpTo-Move");
@@ -642,7 +646,7 @@ namespace AutoDuty.Managers
             {
                 _taskManager.Enqueue(() => Chat.ExecuteCommand("/automove on"), "Jump");
                 _taskManager.Enqueue(() => EzThrottler.Throttle("AutoMove", Convert.ToInt32(wait)), "Jump");
-                _taskManager.Enqueue(() => EzThrottler.Check("AutoMove"), Convert.ToInt32(wait), "Jump");
+                _taskManager.Enqueue(() => EzThrottler.Check("AutoMove"), Convert.ToInt32(wait) + ThrottleTimeoutMarginMs, "Jump");
             }
 
             _taskManager.Enqueue(() => ActionManager.Instance()->UseAction(ActionType.GeneralAction, 2), "Jump");
@@ -699,7 +703,7 @@ namespace AutoDuty.Managers
             if (Plugin.StopForCombat)
                 _taskManager.Enqueue(() => !Player.Character->InCombat, int.MaxValue, "Wait");
             _taskManager.Enqueue(() => StartWaitThrottle(waitMs), "Wait");
-            _taskManager.Enqueue(() => EzThrottler.Check("Wait"), waitMs, "Wait");
+            _taskManager.Enqueue(() => EzThrottler.Check("Wait"), waitMs + ThrottleTimeoutMarginMs, "Wait");
             if (Plugin.StopForCombat)
                 _taskManager.Enqueue(() => !Player.Character->InCombat, int.MaxValue, "Wait");
             _taskManager.Enqueue(() => { Plugin.ClearWaitStepTiming(); Plugin.Action = ""; });
@@ -953,7 +957,17 @@ namespace AutoDuty.Managers
         private unsafe void Interactable(ulong? objectId)
         {
             _taskManager.Enqueue(() => BossMod_IPCSubscriber.SetMovement(false));
-            _taskManager.Enqueue(() => InteractableCheck(ResolveObject(objectId)), "Interactable-InteractableCheck");
+            // InteractableCheck 回 true ＝ 放棄(七個分支都印 "giving up")。放棄時一定要清空
+            // Action:CheckFinishing 只認 Action 是不是空字串來判斷「這步做完了沒」,漏清空
+            // 會讓它白等一輪 60 秒逃生口才退本。這是唯一呼叫點,在這裡清等同於逐個分支清。
+            _taskManager.Enqueue(() =>
+                                 {
+                                     if (!InteractableCheck(ResolveObject(objectId)))
+                                         return false;
+
+                                     Plugin.Action = "";
+                                     return true;
+                                 }, "Interactable-InteractableCheck");
             _taskManager.Enqueue(() => IsCasting, 500, "Interactable-WaitIsCasting");
             _taskManager.Enqueue(() => !IsCasting, "Interactable-WaitNotIsCasting");
             _taskManager.Enqueue(() => BossMod_IPCSubscriber.SetMovement(true));
@@ -1012,13 +1026,12 @@ namespace AutoDuty.Managers
             else
                 dataIds.Add(TryGetObjectIdRegex(action.Arguments[0], out objectDataId) ? (uint.TryParse(objectDataId, out var dataId) ? dataId : 0) : 0);
 
-            // 🔴 dataIds 是 List<uint>，跟字面量 "0"（string）永遠不可能相等——這個防呆
-            //    形同虛設，路徑檔的 Arguments 只要不是純數字（例如誤填成物件顯示名稱），
-            //    parse 失敗會靜默退回 0，然後去找 BaseId=0 的物件亂互動、永遠卡住重試，
-            //    而不是像這裡原本想要的那樣直接跳過這一步。
+            // 契約:TryGetObjectIdRegex 解析不出數字時退回 0。全部都是 0 ⇒ 這一步的 Arguments
+            // 整個填錯(例如誤填物件顯示名稱),硬跑下去只會對 BaseId=0 的物件死等到逾時。
             if (dataIds.All(x => x == 0))
             {
-                Svc.Log.Warning($"Interactable: 所有參數都解析不出有效的 DataId（Arguments=[{string.Join(", ", action.Arguments)}]），跳過這一步。");
+                Svc.Log.Warning($"Interactable: Arguments 解析不出任何 DataId,跳過這一步。"
+                              + $"Arguments=[{string.Join(", ", action.Arguments)}]");
                 return;
             }
 
@@ -1077,27 +1090,29 @@ namespace AutoDuty.Managers
             return MovementHelper.Move(bossV3);
         }
 
-        private void BossLoot(List<IGameObject>? gameObjects, int index)
+        // 收 GameObjectId 而不是 IGameObject:清單是在前一幀建的,IObjectTable 的包裝是
+        // 每格共用、存取時就地改寫 Address ⇒ 跨幀持有會靜默換人或懸空。id 在建清單那一幀抄走。
+        private void BossLoot(List<ulong>? objectIds, int index)
         {
-            if (gameObjects == null || gameObjects.Count < 1)
+            if (objectIds == null || objectIds.Count < 1)
             {
                 _taskManager.DelayNext("BossLoot-WaitASecToLootChest", 1000);
                 return;
             }
 
-            _taskManager.Enqueue(() => MovementHelper.Move(gameObjects[index], 0.25f, 1f), "BossLoot-MoveToChest");
+            ulong chestId = objectIds[index];
+
+            _taskManager.Enqueue(() => MovementHelper.Move(ResolveObject(chestId), 0.25f, 1f), "BossLoot-MoveToChest");
             this.Wait(new PathAction() { Arguments = ["250"] });
 
-            // 走到寶箱旁邊不會自動打開它 —— 原本這裡只有移動、從沒呼叫過互動,寶箱永遠
-            // 原封不動。這裡借用既有的 Interactable(ulong?) 走到+互動流程實際把它打開。
-            var chestId = gameObjects[index].GameObjectId;
+            // 走到寶箱旁邊不會自動開啟它 —— 這裡原本只有移動、從沒呼叫過互動,寶箱永遠原封不動。
             Interactable(chestId);
 
             _taskManager.Enqueue(() =>
             {
                 index++;
-                if (gameObjects.Count > index)
-                    BossLoot(gameObjects, index);
+                if (objectIds.Count > index)
+                    BossLoot(objectIds, index);
                 else
                     _taskManager.DelayNext("BossLoot-WaitASecToLootChest", 1000);
             }, "BossLoot-LoopOrDelay");
@@ -1107,7 +1122,7 @@ namespace AutoDuty.Managers
         {
             Svc.Log.Info($"Starting Action Boss: {Plugin.BossObject?.Name.TextValue ?? "null"}");
             int index = 0;
-            List<IGameObject>? treasureCofferObjects = null;
+            List<ulong>? treasureCofferObjects = null;
             Plugin.SkipTreasureCoffer = false;
             StopForCombat(new PathAction() { Arguments = ["true", "noWait"] });
             _taskManager.Enqueue(() => BossMoveCheck(action.Position),                           "Boss-MoveCheck");
@@ -1122,7 +1137,7 @@ namespace AutoDuty.Managers
             if (Plugin.Configuration.LootTreasure)
             {
                 _taskManager.DelayNext("Boss-TreasureDelay", 1000);
-                _taskManager.Enqueue(() => treasureCofferObjects = GetObjectsByObjectKind(Dalamud.Game.ClientState.Objects.Enums.ObjectKind.Treasure)?.Where(x => BelowDistanceToPlayer(x.Position, 50, 10)).ToList(), "Boss-GetTreasureChests");
+                _taskManager.Enqueue(() => treasureCofferObjects = GetObjectsByObjectKind(Dalamud.Game.ClientState.Objects.Enums.ObjectKind.Treasure)?.Where(x => BelowDistanceToPlayer(x.Position, 50, 10)).Select(x => x.GameObjectId).ToList(), "Boss-GetTreasureChests");
                 _taskManager.Enqueue(() => BossLoot(treasureCofferObjects, index), "Boss-LootCheck");
             }
         }
