@@ -1,0 +1,137 @@
+# 路徑檔改動後自動重算派送清單
+#
+# 為什麼需要這個：AutoDuty/Paths/ 底下的路徑檔**不隨外掛出貨**。使用者的
+# <pluginConfigs>/AutoDuty/paths 啟動時是空目錄，內容唯一的來源是 Updater/Patcher
+# 依 AutoDuty/Resources/md5s.json 逐檔比對雜湊再下載。
+# ⇒ 改了路徑檔卻忘了更新那份清單，使用者手上的舊檔跟清單裡的舊雜湊剛好相等，
+#    Patcher 判定「不用下載」——改動永遠送不出去，而且沒有任何錯誤訊息。
+# 在這支 workflow 之前，這件事完全靠人記得。
+#
+# 上游 erdelf 有等價的 .github/workflows/md5filecreation.yml，但它綁在
+# pull_request_target closed（上游走 PR 流程），而本 fork 是直接推 tc-7.20，
+# 所以改成 push 觸發；雜湊計算也換成讀 git blob（理由見 generate_md5s.py 的檔頭）。
+#
+# 🔴 不會無限迴圈，兩道各自獨立的保險：
+#   1. 用 GITHUB_TOKEN 推的 commit 不會再觸發任何 workflow（GitHub 的迴圈保護）。
+#   2. 這裡只改 AutoDuty/Resources/md5s.json，而觸發條件是 AutoDuty/Paths/**。
+name: 重算路徑檔派送清單
+
+on:
+  push:
+    branches:
+      - 'tc-7.20'
+    paths:
+      - 'AutoDuty/Paths/**'
+  workflow_dispatch:
+
+# 排隊不取消：被取消的那一輪等於「這批路徑改動沒進清單」，而且是靜默的。
+concurrency:
+  group: md5s-tc-7.20
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  md5s:
+    name: 重算 md5s.json
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: tc-7.20
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 重算清單
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/generate_md5s.py
+
+      # 🔴 語料閘門：路徑檔被整批誤刪、或列舉方式壞掉時，產出會是一份「合法但幾乎空」
+      #    的清單，而那跟正常結果長得一樣（照樣 commit、照樣綠燈），受害的是所有使用者
+      #    ——他們的 Patcher 會從此收不到任何路徑檔。所以在寫回分支之前先看筆數。
+      - name: 筆數下限
+        shell: bash
+        run: |
+          set -euo pipefail
+          n="$(python3 -c "import json;print(len(json.load(open('AutoDuty/Resources/md5s.json',encoding='utf-8'))))")"
+          echo "清單筆數：$n"
+          if [ "$n" -lt 250 ]; then
+            echo "::error title=清單筆數異常::只有 $n 筆（下限 250）——不寫回分支"
+            exit 1
+          fi
+
+      - name: 有沒有變更
+        id: diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- AutoDuty/Resources/md5s.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "清單已是最新，什麼都不做。" | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git diff --stat -- AutoDuty/Resources/md5s.json
+          fi
+
+      - name: commit + push
+        if: steps.diff.outputs.changed == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "Claude Sonnet 5"
+          git config user.email "noreply@anthropic.com"
+
+          # 只 add 這一個檔。多 add 一個對不上的路徑會讓整批都不進暫存區，
+          # 而後面的 commit 照樣成功、產出一顆內容不全的 commit。
+          git add -- AutoDuty/Resources/md5s.json
+
+          # 🔴 只准動這一個檔。真的動到別的，寧可停下來。
+          touched="$(git diff --cached --name-only)"
+          if [ "$touched" != "AutoDuty/Resources/md5s.json" ]; then
+            echo "::error title=改動範圍不對::$touched"
+            exit 1
+          fi
+
+          # 主旨會被 changelog 逐字讀，所以走檔案不用 -m 接中文。
+          printf '%s\n' "自動重算路徑檔派送清單 md5s.json" > "$RUNNER_TEMP/md5-msg.txt"
+          printf '%s\n' "" >> "$RUNNER_TEMP/md5-msg.txt"
+          printf '%s\n' "由 .github/workflows/md5s.yml 在 AutoDuty/Paths 有變動時觸發。" >> "$RUNNER_TEMP/md5-msg.txt"
+          git commit -F "$RUNNER_TEMP/md5-msg.txt"
+
+          author="$(git log -1 --format='%an <%ae>')"
+          echo "作者：$author"
+          if [ "$author" != "Claude Sonnet 5 <noreply@anthropic.com>" ]; then
+            echo "::error title=commit 身分不對::$author"
+            exit 1
+          fi
+
+          pushed=0
+          for attempt in 1 2 3; do
+            if git push origin HEAD:tc-7.20; then
+              echo "第 $attempt 次嘗試推送成功"
+              pushed=1
+              break
+            fi
+            echo "推送被拒（遠端有新 commit），rebase 後重試"
+            git pull --rebase origin tc-7.20
+          done
+          if [ "$pushed" != 1 ]; then
+            echo "::error title=push 連續三次失敗::清單沒有更新"
+            exit 1
+          fi
+
+          {
+            echo "### ✅ md5s.json 已更新"
+            echo ""
+            echo "\`$(git log -1 --format='%s')\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+# workflow re-registration trigger 2026-09-16T11:28:09Z
+# workflow re-registration trigger 2026-09-16T19:57:25Z

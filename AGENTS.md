@@ -97,7 +97,10 @@ AutoDuty/
 }
 ```
 
-Key 比對不分大小寫(見 `BuildTab.jsonSerializerOptions`),所以偶爾能看到全小寫的檔案不會壞掉——但那是少數例外(9/326,全部可追溯到「直接整份複製上游原始檔」的修正,例如 `(243) The Binding Coil of Bahamut - Turn 3.json`),不是慣例。**新增/修改路徑檔一律照上面這個 PascalCase 範例**,跟其餘 308 個檔案一致。
+Key 比對不分大小寫(`BuildTab.jsonSerializerOptions` 設了 `PropertyNameCaseInsensitive = true`),
+所以偶爾看到的全小寫檔案不會壞掉 —— 但那是例外不是慣例。326 個路徑檔裡:
+**309 個是上面這種 PascalCase 物件**、8 個是全小寫 key、9 個是更舊的「整份就是一個陣列」格式。
+新增或修改路徑檔一律照上面的範例。
 
 **Common action names**: `MoveTo`, `Boss`, `TreasureCoffer`, `DutySpecificCode`, `Interactable`
 
