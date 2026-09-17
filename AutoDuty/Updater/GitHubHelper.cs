@@ -28,12 +28,21 @@ namespace AutoDuty.Updater
         /// 也就是說 <b>這個常數決定了使用者實際跑的是誰的路徑資料</b>。
         /// </para>
         /// <para>
-        /// 指向 okaminico/AutoDuty-1 的 tw-fix(myfork),而不是 ffxiv-tc-port/AutoDuty 的
-        /// tc-7.20(origin)——tw-fix 定期合併 origin/tc-7.20,並額外帶有尚未回饋上游的
-        /// 本地路徑修正(例如黃金谷 StopForCombat 拖怪修正)。
+        /// 指向 <b>myfork 的 customize 分支</b>:customize 才是實際發布給朋友的那條線,
+        /// 使用者手上的外掛與這裡拿到的路徑檔應該是同一個版本。tw-fix 不對外發布,
+        /// 拿它當來源會讓「外掛版本」與「路徑檔版本」分屬兩條分支。
+        /// </para>
+        /// <para>
+        /// 🔴 <b>repo 名稱是 AutoDuty-TC,不是 AutoDuty-1。</b>2026-09-05 repo 重建
+        /// (切斷 fork 網路)之後舊名就不存在了,而這個常數當時沒跟著改 ——
+        /// raw.githubusercontent 對它回 404,<b>路徑檔更新整條靜默失效</b>
+        /// (Patcher 拿不到 md5s.json 就沒有任何檔案會被下載,而且不會有錯誤訊息)。
+        /// 改動這個常數之後,務必用 <c>curl -I</c> 對
+        /// <c>&lt;PathRepoBaseUrl&gt;AutoDuty/Resources/md5s.json</c> 確認回 200 ——
+        /// 分支沒推上去也會是 404。
         /// </para>
         /// </summary>
-        internal const string PathRepoBaseUrl = "https://raw.githubusercontent.com/okaminico/AutoDuty-1/refs/heads/tw-fix/";
+        internal const string PathRepoBaseUrl = "https://raw.githubusercontent.com/okaminico/AutoDuty-TC/refs/heads/customize/";
 
         private static readonly SocketsHttpHandler _handler = new() { AutomaticDecompression = DecompressionMethods.All, ConnectCallback = new HappyEyeballsCallback().ConnectCallback };
 
