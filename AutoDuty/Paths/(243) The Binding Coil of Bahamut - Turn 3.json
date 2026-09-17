@@ -1,1161 +1,1010 @@
 {
-  "actions": [
+  "Actions": [
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -34.6,
-        "Y": -0.45,
-        "Z": 12.08
+      "Tag": "None",
+      "Name": "MoveTo",
+      "Position": {
+        "X": -34.638943,
+        "Y": -0.4548452,
+        "Z": 12.065976
       },
-      "arguments": [
+      "Arguments": [
         ""
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": "Helps avoid janky pathing."
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -35.8,
-        "Y": 1.01,
-        "Z": 28.83
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": -35.754253,
+        "Y": 1.0067046,
+        "Z": 28.807093
       },
-      "arguments": [
-        ""
-      ],
-      "note": ""
-    },
-    {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
-      },
-      "arguments": [
+      "Arguments": [
         "1000"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -32.24,
-        "Y": 0.08,
-        "Z": 23.14
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": -38.50739,
+        "Y": 1.3587241,
+        "Z": 27.242794
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "500"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "AutoMoveFor",
-      "position": {
-        "X": -36.65,
-        "Y": 1.18,
-        "Z": 26.03
+      "Tag": "None",
+      "Name": "WaitFor",
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
       },
-      "arguments": [
-        "5000"
+      "Arguments": [
+        "IsReady"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": 15.86,
-        "Y": -37.13,
-        "Z": 65.65
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": 15.709053,
+        "Y": -37.131886,
+        "Z": 65.50736
       },
-      "arguments": [
-        ""
-      ],
-      "note": ""
-    },
-    {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
-      },
-      "arguments": [
+      "Arguments": [
         "1000"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": 19.1,
-        "Y": -37.53,
-        "Z": 62.35
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": 12.969387,
+        "Y": -36.77993,
+        "Z": 67.11655
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "500"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "AutoMoveFor",
-      "position": {
-        "X": 15.61,
-        "Y": -37.13,
-        "Z": 65.09
+      "Tag": "None",
+      "Name": "WaitFor",
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
       },
-      "arguments": [
-        "5000"
+      "Arguments": [
+        "IsReady"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": 49.4,
-        "Y": -38,
-        "Z": 12.34
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": 38.915817,
+        "Y": -37.719925,
+        "Z": 12.506676
       },
-      "arguments": [
-        ""
-      ],
-      "note": ""
-    },
-    {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": 38.95,
-        "Y": -37.72,
-        "Z": 12.59
-      },
-      "arguments": [
-        ""
-      ],
-      "note": ""
-    },
-    {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
-      },
-      "arguments": [
+      "Arguments": [
         "1000"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": 41.86,
-        "Y": -37.72,
-        "Z": 14.52
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": 41.69349,
+        "Y": -37.365257,
+        "Z": 11.02513
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "500"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": 49.94,
-        "Y": -37.68,
-        "Z": 9.55
+      "Tag": "None",
+      "Name": "WaitFor",
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "IsReady"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "AutoMoveFor",
-      "position": {
-        "X": 44.05,
-        "Y": -37.75,
-        "Z": 10.96
+      "Tag": "None",
+      "Name": "MoveTo",
+      "Position": {
+        "X": 17.4303,
+        "Y": -75.2342,
+        "Z": 26.984947
       },
-      "arguments": [
-        "5000"
-      ],
-      "note": ""
+      "Arguments": [],
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": 17.46,
-        "Y": -75.23,
-        "Z": 26.96
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": 15.221098,
+        "Y": -75.27482,
+        "Z": 32.12643
       },
-      "arguments": [
-        ""
-      ],
-      "note": ""
-    },
-    {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": 15.11,
-        "Y": -75.27,
-        "Z": 32.45
-      },
-      "arguments": [
-        ""
-      ],
-      "note": ""
-    },
-    {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
-      },
-      "arguments": [
+      "Arguments": [
         "1000"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": 22.66,
-        "Y": -75.81,
-        "Z": 36.92
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": 17.920168,
+        "Y": -74.926796,
+        "Z": 30.68629
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "500"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "AutoMoveFor",
-      "position": {
-        "X": 19.47,
-        "Y": -75.31,
-        "Z": 32.65
+      "Tag": "None",
+      "Name": "WaitFor",
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
       },
-      "arguments": [
-        "5000"
+      "Arguments": [
+        "IsReady"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -6.99,
-        "Y": -113.49,
-        "Z": 22.39
-      },
-      "arguments": [
-        ""
-      ],
-      "note": ""
-    },
-    {
-      "tag": "None",
-      "name": "Interactable",
-      "position": {
+      "Tag": "None",
+      "Name": "Interactable",
+      "Position": {
         "X": -7.73,
         "Y": -113.32,
         "Z": 25.06
       },
-      "arguments": [
+      "Arguments": [
         "2001132"
       ],
-      "note": "Silent Terminal"
+      "Conditions": [],
+      "Note": "Silent Terminal"
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -36.71,
-        "Y": -112.52,
-        "Z": 20.05
+      "Tag": "None",
+      "Name": "MoveTo",
+      "Position": {
+        "X": -32.04684,
+        "Y": -112.1692,
+        "Z": 18.617058
       },
-      "arguments": [
+      "Arguments": [
         ""
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -27.94,
-        "Y": -112.14,
-        "Z": 14.67
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": -27.884184,
+        "Y": -112.13767,
+        "Z": 14.693122
       },
-      "arguments": [
-        ""
-      ],
-      "note": ""
-    },
-    {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
-      },
-      "arguments": [
+      "Arguments": [
         "1000"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -30.38,
-        "Y": -112.04,
-        "Z": 15.04
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": -30.590353,
+        "Y": -111.7908,
+        "Z": 16.090677
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "500"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
+      "Tag": "None",
+      "Name": "WaitFor",
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
       },
-      "arguments": [
-        "7000"
+      "Arguments": [
+        "IsReady"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -17.46,
-        "Y": -150.45,
-        "Z": 0.21
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": -17.313839,
+        "Y": -150.45079,
+        "Z": 0.38055864
       },
-      "arguments": [
-        ""
-      ],
-      "note": ""
-    },
-    {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
-      },
-      "arguments": [
+      "Arguments": [
         "1000"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -15.85,
-        "Y": -150.35,
-        "Z": 1.69
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": -14.7147665,
+        "Y": -150.10011,
+        "Z": 1.9982206
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "500"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
+      "Tag": "None",
+      "Name": "WaitFor",
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
       },
-      "arguments": [
-        "5000"
+      "Arguments": [
+        "IsReady"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
+      "Tag": "None",
+      "Name": "MoveTo",
+      "Position": {
         "X": -29.54,
         "Y": -187.76,
         "Z": -4.51
       },
-      "arguments": [
+      "Arguments": [
         ""
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -29.37,
-        "Y": -187.86,
-        "Z": 0.2
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": -29.524769,
+        "Y": -187.85887,
+        "Z": 0.1416947
       },
-      "arguments": [
-        ""
-      ],
-      "note": ""
-    },
-    {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
-      },
-      "arguments": [
+      "Arguments": [
         "1000"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -30.36,
-        "Y": -187.76,
-        "Z": -2.32
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": -29.493164,
+        "Y": -187.50668,
+        "Z": -2.8918014
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "500"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
+      "Tag": "None",
+      "Name": "WaitFor",
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
       },
-      "arguments": [
-        "5000"
+      "Arguments": [
+        "IsReady"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -11.07,
-        "Y": -186.93,
-        "Z": 52.94
+      "Tag": "None",
+      "Name": "MoveTo",
+      "Position": {
+        "X": -15.741699,
+        "Y": -187.33234,
+        "Z": 48.456364
       },
-      "arguments": [
-        ""
-      ],
-      "note": ""
+      "Arguments": [],
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": -11.137327,
+        "Y": -186.92827,
+        "Z": 53.038372
       },
-      "arguments": [
+      "Arguments": [
         "1000"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -13.36,
-        "Y": -186.76,
-        "Z": 54.86
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": -13.799889,
+        "Y": -186.57594,
+        "Z": 54.508198
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "500"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
+      "Tag": "None",
+      "Name": "WaitFor",
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
       },
-      "arguments": [
-        "5000"
+      "Arguments": [
+        "IsReady"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
+      "Tag": "None",
+      "Name": "MoveTo",
+      "Position": {
         "X": 61.18,
         "Y": -224.54,
         "Z": 23.26
       },
-      "arguments": [
+      "Arguments": [
         ""
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": 60.69,
-        "Y": -224.64,
-        "Z": 18.74
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": 60.645393,
+        "Y": -224.63898,
+        "Z": 18.611181
       },
-      "arguments": [
-        ""
-      ],
-      "note": ""
-    },
-    {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
-      },
-      "arguments": [
+      "Arguments": [
         "1000"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": 59.83,
-        "Y": -224.53,
-        "Z": 21.18
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": 60.703106,
+        "Y": -224.28763,
+        "Z": 21.697464
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "500"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
+      "Tag": "None",
+      "Name": "WaitFor",
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
       },
-      "arguments": [
-        "5000"
+      "Arguments": [
+        "IsReady"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": 43.26,
-        "Y": -262.09,
-        "Z": 7.73
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": 43.43156,
+        "Y": -262.09027,
+        "Z": 7.4770575
       },
-      "arguments": [
-        ""
-      ],
-      "note": ""
-    },
-    {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
-      },
-      "arguments": [
+      "Arguments": [
         "1000"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": 45.12,
-        "Y": -261.99,
-        "Z": 5.99
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": 46.073803,
+        "Y": -261.7383,
+        "Z": 5.9777565
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "500"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
+      "Tag": "None",
+      "Name": "WaitFor",
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
       },
-      "arguments": [
-        "5000"
+      "Arguments": [
+        "IsReady"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": 25.07,
-        "Y": -299.69,
-        "Z": 18.28
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": 25.196198,
+        "Y": -299.69342,
+        "Z": 18.225496
       },
-      "arguments": [
-        ""
-      ],
-      "note": ""
-    },
-    {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
-      },
-      "arguments": [
+      "Arguments": [
         "1000"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": 27,
-        "Y": -299.59,
-        "Z": 19.82
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": 27.844847,
+        "Y": -299.3442,
+        "Z": 19.751461
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "500"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
+      "Tag": "None",
+      "Name": "WaitFor",
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
       },
-      "arguments": [
-        "5000"
+      "Arguments": [
+        "IsReady"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -7.79,
-        "Y": -300.99,
-        "Z": -11.65
-      },
-      "arguments": [
-        ""
-      ],
-      "note": ""
-    },
-    {
-      "tag": "None",
-      "name": "Interactable",
-      "position": {
+      "Tag": "None",
+      "Name": "Interactable",
+      "Position": {
         "X": -8.87,
         "Y": -300.87,
         "Z": -11.97
       },
-      "arguments": [
+      "Arguments": [
         "2001140"
       ],
-      "note": "Silent Terminal"
+      "Conditions": [],
+      "Note": "Silent Terminal"
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -16.13,
-        "Y": -299.77,
-        "Z": -19.96
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": -16.057121,
+        "Y": -299.76987,
+        "Z": -19.836744
       },
-      "arguments": [
-        ""
-      ],
-      "note": ""
-    },
-    {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
-      },
-      "arguments": [
+      "Arguments": [
         "1000"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -16.39,
-        "Y": -299.67,
-        "Z": -21.78
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": -16.174,
+        "Y": -299.449,
+        "Z": -23.213
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "500"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
+      "Tag": "None",
+      "Name": "WaitFor",
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
       },
-      "arguments": [
-        "5000"
+      "Arguments": [
+        "IsReady"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -0.28,
-        "Y": -300.35,
-        "Z": 20.04
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": -0.47463197,
+        "Y": -300.3477,
+        "Z": 20.212957
       },
-      "arguments": [
-        ""
-      ],
-      "note": ""
-    },
-    {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
-      },
-      "arguments": [
+      "Arguments": [
         "1000"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -0.04,
-        "Y": -300.25,
-        "Z": 22.08
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": -0.5214682,
+        "Y": -300.005,
+        "Z": 23.36878
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "500"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
+      "Tag": "None",
+      "Name": "WaitFor",
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
       },
-      "arguments": [
-        "5000"
+      "Arguments": [
+        "IsReady"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -26.76,
-        "Y": -347.5,
-        "Z": 21.73
+      "Tag": "None",
+      "Name": "StopForCombat",
+      "Position": {
+        "X": -24.69612,
+        "Y": -347.3658,
+        "Z": 26.013527
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "FALSE"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": "Helps ensure you don't move off of the activator early due to combat with patrolling Dreadguards."
     },
     {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": -26.971556,
+        "Y": -347.5222,
+        "Z": 21.54424
       },
-      "arguments": [
+      "Arguments": [
         "1000"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -27.37,
-        "Y": -347.42,
-        "Z": 23.65
+      "Tag": "None",
+      "Name": "StopForCombat",
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "TRUE"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": -26.84041,
+        "Y": -347.1767,
+        "Z": 24.744064
       },
-      "arguments": [
-        "5000"
+      "Arguments": [
+        "500"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -62.12,
-        "Y": -384,
-        "Z": -18.14
+      "Tag": "None",
+      "Name": "WaitFor",
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "IsReady"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
+      "Tag": "None",
+      "Name": "MoveTo",
+      "Position": {
+        "X": -58.658672,
+        "Y": -384.9489,
+        "Z": -16.320429
       },
-      "arguments": [
+      "Arguments": [],
+      "Conditions": [],
+      "Note": ""
+    },
+    {
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": -62.148525,
+        "Y": -383.99762,
+        "Z": -18.161762
+      },
+      "Arguments": [
         "1000"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -64.2,
-        "Y": -383.9,
-        "Z": -17.47
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": -64.78601,
+        "Y": -383.6454,
+        "Z": -16.560066
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "500"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
+      "Tag": "None",
+      "Name": "WaitFor",
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
       },
-      "arguments": [
-        "5000"
+      "Arguments": [
+        "IsReady"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -31.76,
-        "Y": -384.2,
-        "Z": -52.79
+      "Tag": "None",
+      "Name": "MoveTo",
+      "Position": {
+        "X": -36.341152,
+        "Y": -384.164,
+        "Z": -49.668697
       },
-      "arguments": [
-        ""
-      ],
-      "note": ""
+      "Arguments": [],
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": -31.698912,
+        "Y": -384.19995,
+        "Z": -52.713867
       },
-      "arguments": [
+      "Arguments": [
         "1000"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -33.37,
-        "Y": -384.1,
-        "Z": -51.63
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": -34.3277,
+        "Y": -383.84866,
+        "Z": -51.18083
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "500"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
+      "Tag": "None",
+      "Name": "WaitFor",
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
       },
-      "arguments": [
-        "5000"
+      "Arguments": [
+        "IsReady"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": 17.26,
-        "Y": -423.62,
-        "Z": -13.24
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": 17.090014,
+        "Y": -423.6244,
+        "Z": -13.1295595
       },
-      "arguments": [
-        ""
-      ],
-      "note": ""
-    },
-    {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
-      },
-      "arguments": [
+      "Arguments": [
         "1000"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": 16.84,
-        "Y": -423.52,
-        "Z": -15.29
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": 17.147417,
+        "Y": -423.27264,
+        "Z": -16.223877
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "500"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
+      "Tag": "None",
+      "Name": "WaitFor",
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
       },
-      "arguments": [
-        "5000"
+      "Arguments": [
+        "IsReady"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": 19.78,
-        "Y": -422.56,
-        "Z": 54.35
+      "Tag": "None",
+      "Name": "StopForCombat",
+      "Position": {
+        "X": 18.632566,
+        "Y": -423.03595,
+        "Z": 59.03166
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "FALSE"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": "Helps ensure you don't move off of the activator early due to combat with patrolling Dreadguards."
     },
     {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": 19.883348,
+        "Y": -422.56314,
+        "Z": 54.504303
       },
-      "arguments": [
+      "Arguments": [
         "1000"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": 21.57,
-        "Y": -422.46,
-        "Z": 53.04
+      "Tag": "None",
+      "Name": "StopForCombat",
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "TRUE"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "Wait",
-      "position": {
-        "X": 0,
-        "Y": 0,
-        "Z": 0
+      "Tag": "None",
+      "Name": "Wait",
+      "Position": {
+        "X": 22.525028,
+        "Y": -422.21082,
+        "Z": 52.984566
       },
-      "arguments": [
-        "5000"
+      "Arguments": [
+        "500"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -25.32,
-        "Y": -423.47,
-        "Z": 42.02
+      "Tag": "None",
+      "Name": "WaitFor",
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
       },
-      "arguments": [
-        ""
+      "Arguments": [
+        "IsReady"
       ],
-      "note": ""
+      "Conditions": [],
+      "Note": ""
     },
     {
-      "tag": "None",
-      "name": "Interactable",
-      "position": {
+      "Tag": "None",
+      "Name": "Interactable",
+      "Position": {
         "X": -25.32,
         "Y": -423.47,
         "Z": 42.15
       },
-      "arguments": [
+      "Arguments": [
         "2002600"
       ],
-      "note": "Silent Terminal"
+      "Conditions": [],
+      "Note": "Silent Terminal"
     },
     {
-      "tag": "None",
-      "name": "MoveTo",
-      "position": {
-        "X": -16.41,
-        "Y": -423.55,
-        "Z": 18.5
-      },
-      "arguments": [
-        ""
-      ],
-      "note": ""
-    },
-    {
-      "tag": "None",
-      "name": "Interactable",
-      "position": {
+      "Tag": "None",
+      "Name": "Interactable",
+      "Position": {
         "X": -17.74,
         "Y": -423.8,
         "Z": 20.49
       },
-      "arguments": [
+      "Arguments": [
         "2001162"
       ],
-      "note": "Allagan Terminal"
+      "Conditions": [],
+      "Note": "Allagan Terminal"
     }
   ],
-  "meta": {
-    "createdAt": 106,
-    "changelog": [
+  "Meta": {
+    "CreatedAt": 106,
+    "Changelog": [
       {
-        "version": 161,
-        "change": "Converted to new JSON Structure"
+        "Version": 161,
+        "Change": "Converted to new JSON Structure"
       },
       {
-        "version": 163,
-        "change": "Converted to newer JSON Structure"
+        "Version": 163,
+        "Change": "Converted to newer JSON Structure"
       },
       {
-        "version": 164,
-        "change": "Converted to JSON Structure with Tags"
+        "Version": 164,
+        "Change": "Converted to JSON Structure with Tags"
       },
       {
-        "version": 186,
-        "change": "Added interaction ids"
+        "Version": 186,
+        "Change": "Added interaction ids"
       },
       {
-        "version": 189,
-        "change": "Adjusted tags to string values"
+        "Version": 189,
+        "Change": "Adjusted tags to string values"
+      },
+      {
+        "Version": 299,
+        "Change": "Replaced Waits after launch pads with WaitFor:IsReady. Replaced MoveTo's on launch pads with short Waits for better consistency. Removed AutoMoveFor steps. Removed excess MoveTo steps."
+      },
+      {
+        "Version": 304,
+        "Change": "Version update"
       }
     ],
-    "notes": []
+    "Notes": []
   }
 }
