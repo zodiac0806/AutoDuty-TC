@@ -327,6 +327,7 @@
     ],
     "BossMod.Autorotation.MiscAI.StayCloseToPartyRole": [],
     "BossMod.Autorotation.MiscAI.StayCloseToTarget": [],
+    "BossMod.Autorotation.MiscAI.GoToPositional": [],
     "BossMod.Autorotation.xan.HealerAI": [
       {
         "Track": "Raise",
