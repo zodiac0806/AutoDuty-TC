@@ -1939,7 +1939,7 @@ public sealed class AutoDuty : IDalamudPlugin
                     ExitDuty();
                 if (Configuration.AutoManageRotationPluginState && !Configuration.UsingAlternativeRotationPlugin)
                     SetRotationPluginSettings(false);
-                if (Configuration.AutoManageBossModAISettings)
+                if (Configuration.AutoManageBossModAISettings) 
                     BossMod_IPCSubscriber.DisablePresets();
             }
         }
