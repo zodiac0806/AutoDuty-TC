@@ -1739,6 +1739,14 @@ public static class ConfigTab
                     Configuration.Save();
                 ImGuiComponents.HelpMarker("開啟後：不管有沒有裝 WrathCombo 或 RotationSolver，戰鬥輸出一律改用 BossMod 自己的 AutoRotation，原本裝的循環外掛會被主動關掉。\n\n" +
                                             "為什麼要開：有些王會標記某個敵人是「要優先打」的目標（例如需要優先擊殺、否則會造成團滅的 add）。這個優先度資訊只存在 BossMod 的王模組裡，只有 BossMod 自己的 AutoRotation 讀得到——WrathCombo、RotationSolver 完全不知道這件事，永遠只會照自己的選怪邏輯（例如打體型最大或血量最高的）打，不會主動去打那個 add。".Loc());
+
+                // 🔴 這個開關單獨開沒有用:送出 "AutoDuty" preset 的 SetPreset() 整個被
+                //    「Auto Manage BossMod AI Settings」gate 住,兩個都要開才會有輸出。沒開的時候
+                //    SetRotationPluginSettings() 會直接忽略這個開關(退回 Wrath → RSR → BossMod 的
+                //    原順序),不會讓角色乾站著 —— 但使用者得知道「我勾了卻沒作用」是為什麼。
+                if (Configuration.ForceBossModAutoRotation && !Configuration.AutoManageBossModAISettings)
+                    ImGui.TextColored(ImGuiColors.DalamudYellow,
+                                      "　⚠ 需要同時開啟下方的「Auto Manage BossMod AI Settings」才會生效,目前暫時忽略。".Loc());
             }
 
             ImGui.Separator();

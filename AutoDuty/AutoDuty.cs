@@ -2058,9 +2058,19 @@ public sealed class AutoDuty : IDalamudPlugin
         // 會呼叫 SetAutoMode(false)，只是永遠不會被視為「找到可用的循環外掛」
         // (foundRotation 不會被設成 true)，讓下面 bmEnabled 那段走「!foundRotation」
         // 分支，套用會讀 AIHints.Priority 的 "AutoDuty" preset。
+        //
+        // 🔴 必須跟 AutoManageBossModAISettings 連動,否則會生出「全程零技能」的狀態:
+        //    真正把 "AutoDuty" preset 送出去的 BossMod_IPCSubscriber.SetPreset() 整個被
+        //    AutoManageBossModAISettings gate 住(SetRange／SetMovement／SetPositional 也是)。
+        //    那個設定關著時,這裡若還照樣把 Wrath/RSR 關掉,結果就是「循環外掛被主動關掉，
+        //    BossMod 的 preset 又一次都沒送出去」——兩邊都不出手。所以那邊關著就當這個開關
+        //    沒開,退回上游原本的 Wrath → RSR → BossMod 順序。UI 那側(ConfigTab)也會把這個
+        //    相依關係講出來,這裡是不依賴 UI 的最後一道保險。
+        bool forceBossMod = this.Configuration is { ForceBossModAutoRotation: true, AutoManageBossModAISettings: true };
+
         if (Wrath_IPCSubscriber.IsEnabled)
         {
-            bool wrathOn = on && !this.Configuration.ForceBossModAutoRotation;
+            bool wrathOn = on && !forceBossMod;
             bool wrathRotationReady = true;
             if (wrathOn)
                 wrathRotationReady = Wrath_IPCSubscriber.IsCurrentJobAutoRotationReady() ||
@@ -2070,13 +2080,19 @@ public sealed class AutoDuty : IDalamudPlugin
             {
                 Svc.Log.Debug(wrathOn ? "Wrath rotation enabled" : "Wrath rotation disabled");
                 Wrath_IPCSubscriber.SetAutoMode(wrathOn);
-                foundRotation = foundRotation || wrathOn;
+                // foundRotation ＝「Wrath 這個循環外掛歸我們管」，不是「這一次有沒有把它打開」。
+                // 🔴 關閉那一側(on == false)上游也是設 true —— 下面 bmEnabled 的 else 分支
+                //    (`!foundRotation || AutoManageBossModAISettings`)靠它分辨「有外部循環外掛」
+                //    與「只有 BossMod」。寫成 `|| wrathOn` 的話 on==false 時它永遠是 false，
+                //    等於偷偷改掉上游語意；目前剛好被 DisablePresets() 自己開頭的二次 gate 蓋掉
+                //    而看不出差別，但那是兩層 gate 互相抵銷，不是這裡寫對了。
+                foundRotation = foundRotation || !on || wrathOn;
             }
         }
 
         if (ReflectionHelper.RotationSolver_Reflection.RotationSolverEnabled)
         {
-            if (on && !foundRotation && !this.Configuration.ForceBossModAutoRotation)
+            if (on && !foundRotation && !forceBossMod)
             {
                 Svc.Log.Debug("RSR enabled");
                 if (ReflectionHelper.RotationSolver_Reflection.GetStateType != ReflectionHelper.RotationSolver_Reflection.StateTypeEnum.Auto)
