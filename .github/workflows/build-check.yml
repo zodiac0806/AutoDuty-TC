@@ -1,15 +1,25 @@
 # 2026-09-05 repo 重建(切斷 fork 網路)後,dispatch-only workflow 需要一次 push 才會重新註冊。
 name: Build Check
 
+# 🔴 觸發分支要涵蓋「實際有人動的分支」,不是只有上游鏡像分支。
+#    workflow 跑的 repo 是 myfork(okaminico/AutoDuty-TC),那裡沒有人動 tc-7.20
+#    —— 它是純上游鏡像(見 plugin-fork-standards.md 第 3 節的三層分支模型),
+#    真正在改的是 tw-fix 與 customize。只列 tc-7.20 等於這份檢查在 myfork 上
+#    永遠不會跑,手動 push 上去的東西完全沒人把關(兩份 sync workflow 內建的
+#    建置檢查只保護「自動合併」那條路徑)。
 on:
   push:
     branches:
       - 'tc-7.20'
+      - 'tw-fix'
+      - 'customize'
     tags-ignore:
       - 'v*'
   pull_request:
     branches:
       - 'tc-7.20'
+      - 'tw-fix'
+      - 'customize'
   workflow_dispatch:
 permissions:
   contents: read

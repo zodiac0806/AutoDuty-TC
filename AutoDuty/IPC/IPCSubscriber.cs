@@ -319,13 +319,47 @@ namespace AutoDuty.IPC
                 Svc.Log.Information($"BMR StayCloseToPartyRole Role={role} 沒有生效:兩個 preset 都不接受這條軌道(軌道名或模組不存在)。");
         }
 
+        /// <summary>上一次已經輸出過的 Positional 診斷指紋（值 ＋ 兩個 preset 的接受結果）。</summary>
+        private static string _lastPositionalReport = "";
+
+        /// <summary>
+        /// 送出 BossMod MiscAI 的 GoToPositional「繞到側面／背面」軌道。
+        /// </summary>
+        /// <remarks>
+        /// 🔴 <b>兩個 preset 都要寫。</b>改動前這裡只寫 <c>"AutoDuty Passive"</c>，因為上游假設
+        /// 「有 Wrath／RSR 在輸出時，BossMod 只當走位用的 passive preset」——啟用中的一定是 Passive。
+        /// 但 <c>ForceBossModAutoRotation</c> 開著時啟用中的是 <c>"AutoDuty"</c>，於是
+        /// <c>ActionsManager.BossCheck()</c> 每 25ms 算出來的 Avarice 側背提示全部寫進一個
+        /// <b>沒有啟用</b>的 preset，近戰整場王戰不再繞側背，而且<b>完全靜默</b>。
+        /// ⚠️ 另一半在 <c>Resources/AutoDuty.json</c>：那張 preset 原本沒有 GoToPositional 這個模組，
+        /// 提供端的 <c>addTransientStrategy</c> 用 <c>Modules.Find(m =&gt; m.Type == mt)</c> 找不到就回
+        /// false —— 只改這裡不補模組一樣是白寫。兩邊要一起改。
+        /// </remarks>
         public static void SetPositional(Positional positional)
         {
             if (Plugin.Configuration.AutoManageBossModAISettings)
             {
                 Svc.Log.Debug($"BossMod Setting Positional: {positional}");
 
-                Presets_AddTransientStrategy("AutoDuty Passive", "BossMod.Autorotation.MiscAI.GoToPositional", "Positional", positional.ToString());
+                string value = positional.ToString();
+
+                bool active  = Presets_AddTransientStrategy("AutoDuty",         "BossMod.Autorotation.MiscAI.GoToPositional", "Positional", value);
+                bool passive = Presets_AddTransientStrategy("AutoDuty Passive", "BossMod.Autorotation.MiscAI.GoToPositional", "Positional", value);
+
+                // 與 SetRange 同一個約定：送出本身照舊每次都送，只有「值或結果變了」才輸出 Information。
+                string report = $"{value}|{active}|{passive}";
+                if (report == _lastPositionalReport)
+                    return;
+
+                _lastPositionalReport = report;
+
+                if (!IsEnabled)
+                    Svc.Log.Information($"BMR GoToPositional Positional={value}：BossMod／BossModReborn 沒有啟用，這次沒有送出。");
+                else if (active || passive)
+                    Svc.Log.Information($"BMR GoToPositional Positional={value} 已送出（AutoDuty={active}、AutoDuty Passive={passive}）。");
+                else
+                    Svc.Log.Information($"BMR GoToPositional Positional={value} 沒有生效：兩個 preset 都不接受這條軌道（軌道名或模組不存在，" +
+                                        $"舊的 AutoDuty preset 沒有 GoToPositional 模組時就會這樣——開啟「自動更新 preset」或手動刪掉舊 preset 即可）。");
             }
         }
     }
@@ -529,7 +563,7 @@ namespace AutoDuty.IPC
 
         internal static bool IsEnabled => IPCSubscriber_Common.IsReady("Gearsetter");
 
-        internal static List<(uint ItemId, InventoryType? SourceInventory, byte? SourceInventorySlot, RaptureGearsetModule.GearsetItemIndex TargetSlot)> GetRecommendationsForGearset(byte gearset) =>
+        internal static List<(uint ItemId, InventoryType? SourceInventory, int? SourceInventorySlot, RaptureGearsetModule.GearsetItemIndex TargetSlot)> GetRecommendationsForGearset(byte gearset) =>
             Pkg.GetRecommendationsForGearset(gearset);
 
         internal static void Dispose() { }
@@ -950,8 +984,32 @@ namespace AutoDuty.IPC
         internal static bool SetJobAutoReady() =>
             Register() && DoThing(() => SetCurrentJobAutoRotationReady(_curLease!.Value));
 
+        /// <summary>
+        ///     開／關 Wrath Combo 的 Auto-Rotation（連同 AutoDuty 需要的那幾條 config）。
+        /// </summary>
+        /// <remarks>
+        /// 🔴 <b>「本來就是關的」不要為了關它去拿租約。</b><see cref="Register"/> 會在還沒有租約時
+        /// 去 <c>RegisterForLeaseWithCallback</c>，而且<b>註冊失敗的副作用是直接把
+        /// <c>AutoManageRotationPluginState</c> 關掉並存檔</b>。
+        /// <c>ForceBossModAutoRotation</c> 開著時，<c>SetRotationPluginSettings</c> 每 5 秒就會來這裡
+        /// 送一次 <c>SetAutoMode(false)</c>——如果照舊無條件 Register，等於「明明說了不要用 Wrath」
+        /// 的人反而每趟本都被掛上一份 AutoDuty 租約（Wrath 那側還會顯示被我們接管），
+        /// 而且白白把上面那個副作用攤在他面前。
+        /// <para>
+        /// 判準是<b>誰持有真狀態</b>：<c>_curLease != null</c> ⇒ 這一份 Auto-Rotation 是我們自己開的，
+        /// 一定要照常送關閉（<c>Register()</c> 此時本來就直接回 true，沒有額外成本）。
+        /// 沒有租約時才看 Wrath 回報的實際狀態，只有真的開著（＝真的會跟 BossMod 搶技能）才去拿租約關它。
+        /// ⚠️ 只在 <c>!on</c> 這一側做這個判斷：<c>on</c> 那一側本來就非拿租約不可。
+        /// </para>
+        /// </remarks>
         internal static void SetAutoMode(bool on)
         {
+            if (!on && _curLease == null && !GetAutoRotationState())
+            {
+                Svc.Log.Debug("Wrath auto-rotation is already off and we hold no lease - skipping SetAutoMode(false).");
+                return;
+            }
+
             if (Register())
             {
                 bool autoRotationState = DoThing(() => SetAutoRotationState(_curLease!.Value, on));

@@ -6,6 +6,13 @@ name: Sync tw-fix into customize & Auto Release
 # 只要遇到合併衝突或建置失敗，就整個跳過不動、工作流程標記失敗，等你手動處理，
 # 不會有半殘的東西被推上去或發佈給朋友。
 
+# ⚠️ remote 命名:這裡的 origin 跟你本機的 origin 不是同一個 repo。
+#    Actions 裡的 origin ＝ workflow 所在的 repo ＝ myfork(okaminico/AutoDuty-TC);
+#    本機的 origin ＝ ffxiv-tc-port/AutoDuty(見 CLAUDE.md 的 remote 慣例),
+#    而本機的 upstream ＝ 原始上游 awgil/AutoDuty。三個地方同一個字三個意思。
+#    底下的 origin 全部都是 myfork —— 這份 workflow 的來源是「同一個 repo 裡的
+#    tw-fix」,不是任何外部上游,所以它完全不需要新增 remote。
+
 on:
   schedule:
     - cron: '30 18 * * *' # 每天 UTC 18:30（台灣時間 02:30，排在 sync-tc-upstream.yml 之後)

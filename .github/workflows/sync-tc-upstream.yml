@@ -1,0 +1,103 @@
+name: Sync TC Upstream (tw-fix)
+
+# 每天自動抓 ffxiv-tc-port/AutoDuty（tc-7.20）的更新，合併進 tw-fix。
+# tw-fix 不對外發布——它是「乾淨、隨時可以拿去回報 PR 給上游」的分支，
+# 所以這裡只做「合併乾淨 + 建置檢查通過」才 push，不建 Release、不碰 repo.json。
+# 真正發布給朋友的是 customize 分支，見 sync-customize.yml（它會再從 tw-fix 同步過去）。
+# 遇到合併衝突或建置失敗就整個跳過不動、工作流程標記失敗，等你手動處理。
+
+# ⚠️ remote 命名:這裡的 origin 跟你本機的 origin 不是同一個 repo。
+#    Actions 裡的 origin ＝ workflow 所在的 repo ＝ myfork(okaminico/AutoDuty-TC);
+#    本機的 origin ＝ ffxiv-tc-port/AutoDuty(見 CLAUDE.md 的 remote 慣例),
+#    而本機的 upstream ＝ 原始上游 awgil/AutoDuty。三個地方同一個字三個意思。
+#    所以底下指向 ffxiv-tc-port 的那個 remote 刻意命名為 tcport 而不是 upstream,
+#    免得跟本機慣例裡的 upstream(awgil)搞混。
+
+on:
+  schedule:
+    - cron: '0 18 * * *' # 每天 UTC 18:00（台灣時間 02:00）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout tw-fix
+        uses: actions/checkout@v5
+        with:
+          ref: tw-fix
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch tcport (ffxiv-tc-port/AutoDuty)
+        run: |
+          git remote add tcport https://github.com/ffxiv-tc-port/AutoDuty.git
+          git fetch tcport tc-7.20
+
+      - name: Merge tcport
+        id: merge
+        shell: pwsh
+        run: |
+          $before = git rev-parse HEAD
+          git merge --no-edit tcport/tc-7.20
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "::warning::合併發生衝突，中止並跳過本次自動流程"
+            git merge --abort
+            "status=conflict" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+            exit 0
+          }
+          $after = git rev-parse HEAD
+          if ($before -eq $after) {
+            "status=nochange" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          } else {
+            "status=merged" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          }
+
+      - name: Update submodules after merge
+        if: steps.merge.outputs.status == 'merged'
+        run: git submodule update --init --recursive
+
+      - name: Install .NET
+        if: steps.merge.outputs.status == 'merged'
+        uses: actions/setup-dotnet@v5
+        with:
+          # 子模組 WrathCombo.API 用了 C# 14 的語法，要 .NET 10 SDK 才編得動；
+          # 目標框架本身仍是 net9 / API13，跟 release.yml 用同一個理由。
+          dotnet-version: 10.x
+
+      - name: Download Dalamud (pinned TC-compatible build)
+        if: steps.merge.outputs.status == 'merged'
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri https://github.com/ffxiv-tc-port/DalamudPluginsTC/releases/download/dalamud-pin-v13.0.0.16/dalamud-api13-net9.zip -OutFile dalamud-pinned.zip
+          Expand-Archive -Force dalamud-pinned.zip "$env:AppData\FFXIVSimpleLauncher\Dalamud\Injector\"
+
+      - name: Build check
+        id: build
+        if: steps.merge.outputs.status == 'merged'
+        shell: pwsh
+        run: |
+          dotnet build --configuration Release AutoDuty/AutoDuty.csproj -p:DalamudLibPath="$env:AppData\FFXIVSimpleLauncher\Dalamud\Injector\"
+          if ($LASTEXITCODE -ne 0) {
+            "status=failed" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+            exit 0
+          }
+          "status=success" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Push tw-fix
+        if: steps.merge.outputs.status == 'merged' && steps.build.outputs.status == 'success'
+        run: git push origin tw-fix
+
+      - name: Report unfinished sync
+        if: steps.merge.outputs.status == 'conflict' || steps.build.outputs.status == 'failed'
+        run: |
+          echo "::error::自動同步未完成（merge=${{ steps.merge.outputs.status }}, build=${{ steps.build.outputs.status }}），需要手動處理"
+          exit 1
