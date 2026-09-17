@@ -984,8 +984,32 @@ namespace AutoDuty.IPC
         internal static bool SetJobAutoReady() =>
             Register() && DoThing(() => SetCurrentJobAutoRotationReady(_curLease!.Value));
 
+        /// <summary>
+        ///     開／關 Wrath Combo 的 Auto-Rotation（連同 AutoDuty 需要的那幾條 config）。
+        /// </summary>
+        /// <remarks>
+        /// 🔴 <b>「本來就是關的」不要為了關它去拿租約。</b><see cref="Register"/> 會在還沒有租約時
+        /// 去 <c>RegisterForLeaseWithCallback</c>，而且<b>註冊失敗的副作用是直接把
+        /// <c>AutoManageRotationPluginState</c> 關掉並存檔</b>。
+        /// <c>ForceBossModAutoRotation</c> 開著時，<c>SetRotationPluginSettings</c> 每 5 秒就會來這裡
+        /// 送一次 <c>SetAutoMode(false)</c>——如果照舊無條件 Register，等於「明明說了不要用 Wrath」
+        /// 的人反而每趟本都被掛上一份 AutoDuty 租約（Wrath 那側還會顯示被我們接管），
+        /// 而且白白把上面那個副作用攤在他面前。
+        /// <para>
+        /// 判準是<b>誰持有真狀態</b>：<c>_curLease != null</c> ⇒ 這一份 Auto-Rotation 是我們自己開的，
+        /// 一定要照常送關閉（<c>Register()</c> 此時本來就直接回 true，沒有額外成本）。
+        /// 沒有租約時才看 Wrath 回報的實際狀態，只有真的開著（＝真的會跟 BossMod 搶技能）才去拿租約關它。
+        /// ⚠️ 只在 <c>!on</c> 這一側做這個判斷：<c>on</c> 那一側本來就非拿租約不可。
+        /// </para>
+        /// </remarks>
         internal static void SetAutoMode(bool on)
         {
+            if (!on && _curLease == null && !GetAutoRotationState())
+            {
+                Svc.Log.Debug("Wrath auto-rotation is already off and we hold no lease - skipping SetAutoMode(false).");
+                return;
+            }
+
             if (Register())
             {
                 bool autoRotationState = DoThing(() => SetAutoRotationState(_curLease!.Value, on));
