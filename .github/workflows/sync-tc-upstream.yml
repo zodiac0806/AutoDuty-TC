@@ -6,6 +6,13 @@ name: Sync TC Upstream (tw-fix)
 # 真正發布給朋友的是 customize 分支，見 sync-customize.yml（它會再從 tw-fix 同步過去）。
 # 遇到合併衝突或建置失敗就整個跳過不動、工作流程標記失敗，等你手動處理。
 
+# ⚠️ remote 命名:這裡的 origin 跟你本機的 origin 不是同一個 repo。
+#    Actions 裡的 origin ＝ workflow 所在的 repo ＝ myfork(okaminico/AutoDuty-TC);
+#    本機的 origin ＝ ffxiv-tc-port/AutoDuty(見 CLAUDE.md 的 remote 慣例),
+#    而本機的 upstream ＝ 原始上游 awgil/AutoDuty。三個地方同一個字三個意思。
+#    所以底下指向 ffxiv-tc-port 的那個 remote 刻意命名為 tcport 而不是 upstream,
+#    免得跟本機慣例裡的 upstream(awgil)搞混。
+
 on:
   schedule:
     - cron: '0 18 * * *' # 每天 UTC 18:00（台灣時間 02:00）
@@ -30,17 +37,17 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Fetch upstream
+      - name: Fetch tcport (ffxiv-tc-port/AutoDuty)
         run: |
-          git remote add upstream https://github.com/ffxiv-tc-port/AutoDuty.git
-          git fetch upstream tc-7.20
+          git remote add tcport https://github.com/ffxiv-tc-port/AutoDuty.git
+          git fetch tcport tc-7.20
 
-      - name: Merge upstream
+      - name: Merge tcport
         id: merge
         shell: pwsh
         run: |
           $before = git rev-parse HEAD
-          git merge --no-edit upstream/tc-7.20
+          git merge --no-edit tcport/tc-7.20
           if ($LASTEXITCODE -ne 0) {
             Write-Host "::warning::合併發生衝突，中止並跳過本次自動流程"
             git merge --abort
