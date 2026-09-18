@@ -1,14 +1,14 @@
-[submodule "ECommons"]
+﻿[submodule "ECommons"]
 	path = ECommons
-	url = ../ECommons.git.git
+	url = ../ECommons.git
 [submodule "ECommons.IPC"]
 	path = ECommons.IPC
-	url = ../ECommons.IPC.git.git
+	url = ../ECommons.IPC.git
 	branch = tc-api13
 [submodule "WrathCombo.API"]
 	path = WrathCombo.API
-	url = ../WrathCombo.API.git.git
+	url = ../WrathCombo.API.git
 	branch = tc-api13
 [submodule "ffxiv_pictomancy"]
 	path = ffxiv_pictomancy
-	url = ../ffxiv_pictomancy-sourpuh.git.git
+	url = ../ffxiv_pictomancy-sourpuh.git
