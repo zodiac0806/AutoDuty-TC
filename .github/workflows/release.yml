@@ -22,7 +22,7 @@ jobs:
       - name: Download Dalamud (pinned TC-compatible build)
         shell: pwsh
         run: |
-          Invoke-WebRequest -Uri https://github.com/ffxiv-tc-port/DalamudPluginsTC/releases/download/dalamud-pin-v13.0.0.16/dalamud-api13-net9.zip -OutFile dalamud-pinned.zip
+          Invoke-WebRequest -Uri https://github.com/zodiac0806/BossmodReborn-TC/releases/download/dalamud-pin-v13.0.0.16/dalamud-api13-net9.zip -OutFile dalamud-pinned.zip
           Expand-Archive -Force dalamud-pinned.zip "$env:AppData\FFXIVSimpleLauncher\Dalamud\Injector\"
           Expand-Archive -Force dalamud-pinned.zip "$env:AppData\xivlauncher\Addon\Hooks\dev\"
       - name: Compute version
