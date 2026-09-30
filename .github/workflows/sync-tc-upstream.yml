@@ -14,8 +14,6 @@ name: Sync TC Upstream (tw-fix)
 #    免得跟本機慣例裡的 upstream(awgil)搞混。
 
 on:
-  schedule:
-    - cron: '0 18 * * *' # 每天 UTC 18:00（台灣時間 02:00）
   workflow_dispatch:
 
 permissions:
@@ -77,7 +75,7 @@ jobs:
         if: steps.merge.outputs.status == 'merged'
         shell: pwsh
         run: |
-          Invoke-WebRequest -Uri https://github.com/ffxiv-tc-port/DalamudPluginsTC/releases/download/dalamud-pin-v13.0.0.16/dalamud-api13-net9.zip -OutFile dalamud-pinned.zip
+          Invoke-WebRequest -Uri https://github.com/zodiac0806/BossmodReborn-TC/releases/download/dalamud-pin-v13.0.0.16/dalamud-api13-net9.zip -OutFile dalamud-pinned.zip
           Expand-Archive -Force dalamud-pinned.zip "$env:AppData\FFXIVSimpleLauncher\Dalamud\Injector\"
 
       - name: Build check
